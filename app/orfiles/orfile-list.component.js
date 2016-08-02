@@ -47,6 +47,7 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     this.fileTypeFilter = '';
                     this.subsystemFilter = '';
                     this.statusFilter = '';
+                    this.retryList = [];
                 }
                 ORFileListComponent.prototype.ngOnInit = function () {
                     var _this = this;

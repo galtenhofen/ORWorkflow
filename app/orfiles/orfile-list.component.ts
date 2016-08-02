@@ -34,7 +34,7 @@ export class ORFileListComponent
     endDate: string;
     currentORFileGroupId: string;
     orfiles: IORFile[];
-    retryList: any[];
+    retryList: any[] = [];
 
 constructor(private _orfileService: ORFileService){
 
