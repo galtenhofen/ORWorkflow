@@ -32,7 +32,14 @@
                 <input type='text' [(ngModel)]='subsystemFilter' placeholder="Subsystem Detail Type"/>
             </div>
             <div class='col-xs-3'>
-                <input type='text' [(ngModel)]='statusFilter' placeholder="Status"/>
+                <select name ="status" form = "statusForm" [(ngModel)]='statusFilter' placeholder="Status" default = "Status">
+                    <option value="">All</option>
+                    <option value="In Progress">Failed</option>
+                    <option value="Case Complete">Open Cases</option>
+                    <option value="Waiting">Case Complete</option>
+                    <option value="Failed">Purged</option>
+                </select>
+                <!-- <input type='select' [(ngModel)]='statusFilter' placeholder="Status"/> -->
             </div>
         </div>
    <div class='row' >
