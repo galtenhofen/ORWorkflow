@@ -8,6 +8,7 @@ import {bootstrap} from 'angular2/platform/browser';
 import {UtilityListComponent} from '../utilities/utility-list.component';
 import {ORFileService} from './orfile.service';
 import {SoapService} from 'angular2-soap-master/src/soap.service';
+//import {ngTableResize} from '../../node_modules/angular-table-resize/dist/angular-table-resize.js';
 //import {ConfirmService} from "../shared/confirm/confirm.service";
 //import {ConfirmComponent} from "../shared/confirm/confirm.component";
 
@@ -35,6 +36,8 @@ export class ORFileListComponent
     currentORFileGroupId: string;
     orfiles: IORFile[];
     retryList: any[] = [];
+    utilityList: any[] = [];
+   // resizeMode: string = "BasicResizer";
 
 constructor(private _orfileService: ORFileService){
 
@@ -133,10 +136,40 @@ constructor(private _orfileService: ORFileService){
         console.log('End Date: ' + this.endDate);
     }
 
-    onUtilitySelected(message:string): void{
+    onUtilitySelected(message:string, ordfgId, providerId): void{
          console.log('IN onUtilitySelected  orfile-list component ');
          console.log('IN onUtilitySelected  message: ' + message);
-        
+        console.log('IN onUtilitySelected  ORDataFileGroupId: ' + ordfgId + '  ProviderId: ' + providerId  );
+
+         if(message == '2' || message == '3'){
+            var existIndex = this.utilityList.indexOf(ordfgId);
+            console.log('IN onUtilitySelected  ORDataFileGroupId : '+ ordfgId + ' exists in arraty at position ' + existIndex);
+            if(existIndex > -1){
+                this.utilityList.splice(existIndex,3)
+                console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+                }
+    
+                if(message == '2'){    
+                    this.utilityList.push(ordfgId,providerId, 'unconvert');
+                }
+                else if(message == '3'){
+                    this.utilityList.push(ordfgId,providerId, 'purgeAll');
+                }
+             console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+    
+        }
+        else{
+            var existIndex = this.utilityList.indexOf(ordfgId);
+            console.log('IN onUtilitySelected  ORDataFileGroupId : '+ ordfgId + ' exists in arraty at position ' + existIndex);
+            if(existIndex > -1){
+                this.utilityList.splice(existIndex,3)
+                console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+            }
+            else{
+            console.log('IN onUtilitySelected  NO UTILITY CHOSEN: ');
+            console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+       	    }
+        }
     }
 
     formatDate(dateToFormat:Date): string{

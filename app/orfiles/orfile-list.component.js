@@ -36,10 +36,12 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                 orfile_service_1 = orfile_service_1_1;
             }],
         execute: function() {
+            //import {ngTableResize} from '../../node_modules/angular-table-resize/dist/angular-table-resize.js';
             //import {ConfirmService} from "../shared/confirm/confirm.service";
             //import {ConfirmComponent} from "../shared/confirm/confirm.component";
             //declare var componentHandler:any;
             ORFileListComponent = (function () {
+                // resizeMode: string = "BasicResizer";
                 function ORFileListComponent(_orfileService) {
                     this._orfileService = _orfileService;
                     this.pageTitle = 'OR Status';
@@ -48,6 +50,7 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     this.subsystemFilter = '';
                     this.statusFilter = '';
                     this.retryList = [];
+                    this.utilityList = [];
                 }
                 ORFileListComponent.prototype.ngOnInit = function () {
                     var _this = this;
@@ -120,9 +123,37 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     //var endString: string = ((this.endDate).getFullYear()).toString() + "/" + ((this.endDate).getMonth()).toString() + "/" + ((this.endDate).getDay()).toString();        
                     console.log('End Date: ' + this.endDate);
                 };
-                ORFileListComponent.prototype.onUtilitySelected = function (message) {
+                ORFileListComponent.prototype.onUtilitySelected = function (message, ordfgId, providerId) {
                     console.log('IN onUtilitySelected  orfile-list component ');
                     console.log('IN onUtilitySelected  message: ' + message);
+                    console.log('IN onUtilitySelected  ORDataFileGroupId: ' + ordfgId + '  ProviderId: ' + providerId);
+                    if (message == '2' || message == '3') {
+                        var existIndex = this.utilityList.indexOf(ordfgId);
+                        console.log('IN onUtilitySelected  ORDataFileGroupId : ' + ordfgId + ' exists in arraty at position ' + existIndex);
+                        if (existIndex > -1) {
+                            this.utilityList.splice(existIndex, 3);
+                            console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+                        }
+                        if (message == '2') {
+                            this.utilityList.push(ordfgId, providerId, 'unconvert');
+                        }
+                        else if (message == '3') {
+                            this.utilityList.push(ordfgId, providerId, 'purgeAll');
+                        }
+                        console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+                    }
+                    else {
+                        var existIndex = this.utilityList.indexOf(ordfgId);
+                        console.log('IN onUtilitySelected  ORDataFileGroupId : ' + ordfgId + ' exists in arraty at position ' + existIndex);
+                        if (existIndex > -1) {
+                            this.utilityList.splice(existIndex, 3);
+                            console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+                        }
+                        else {
+                            console.log('IN onUtilitySelected  NO UTILITY CHOSEN: ');
+                            console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+                        }
+                    }
                 };
                 ORFileListComponent.prototype.formatDate = function (dateToFormat) {
                     var dayNum = dateToFormat.getDate();

@@ -6,7 +6,6 @@ import {bootstrap} from 'angular2/platform/browser';
 import {ORFileListComponent} from './orfiles/orfile-list.component';
 import {ORFileService} from './orfiles/orfile.service';
 
-
 @Component({
     selector: 'orw-app',
     template: `<div><h1> {{pageTitle}} </h1>

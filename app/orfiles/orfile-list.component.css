@@ -1,3 +1,21 @@
 thead{
-    color: #337AB7
+    color: #337AB7;
+      width: 100%;
+}
+
+table{
+    table-layout:auto;
+}
+
+table tr{
+height:20px;   
+overflow-x: hidden;         
+}
+
+table td{
+height:20px;
+max-width: 100px;
+overflow-x: hidden;  
+overflow-y: hidden; 
+white-space: nowrap;       
 }
