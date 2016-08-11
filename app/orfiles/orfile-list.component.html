@@ -104,7 +104,7 @@
                     <td>{{orfile.processStep}}</td>
                     <td>{{orfile.processStatus}}</td>
                     <td style='width:100px'>{{orfile.errorMessage}}</td>
-                    <td *ngIf="orfile.processStatus=='Failed'"><input #retryCheckbox type="checkbox" id="retryCheckbox" value="option1" (change)="onToggleRetry(orfile.orDataFileGroupID,retryCheckbox.checked,orfile.processStep)" aria-label="..."></td>
+                    <td *ngIf="orfile.processStatus=='Failed'"><input #retryCheckbox type="checkbox" id="retryCheckbox" value="option1" (change)="onToggleRetry(orfile.orDataFileGroupID,retryCheckbox.checked,orfile.processStep, orfile.providerID)" aria-label="..."></td>
                     <td *ngIf="orfile.processStatus!='Failed'"><div></div></td>   
                     <td>{{orfile.retryCount}}</td>
                     <td *ngIf="!orfile.publishCompleteDate"><orw-utility-list (utilitySelected)='onUtilitySelected($event, orfile.orDataFileGroupID, orfile.providerID)'></orw-utility-list></td>

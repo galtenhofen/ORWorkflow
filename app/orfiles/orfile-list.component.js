@@ -41,7 +41,6 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
             //import {ConfirmComponent} from "../shared/confirm/confirm.component";
             //declare var componentHandler:any;
             ORFileListComponent = (function () {
-                // resizeMode: string = "BasicResizer";
                 function ORFileListComponent(_orfileService) {
                     this._orfileService = _orfileService;
                     this.pageTitle = 'OR Status';
@@ -51,6 +50,8 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     this.statusFilter = '';
                     this.retryList = [];
                     this.utilityList = [];
+                    this.utilityObjects = [];
+                    this.retryObjects = [];
                 }
                 ORFileListComponent.prototype.ngOnInit = function () {
                     var _this = this;
@@ -88,23 +89,54 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                         console.log('You fucked up the dates');
                     }
                 };
-                ORFileListComponent.prototype.onToggleRetry = function (ordfgId, checked, processStep) {
-                    console.log('Retry button clicked.  ORDataFileGroupId: ' + ordfgId + '  Current value = ' + checked + '  Step: ' + processStep);
+                ORFileListComponent.prototype.onToggleRetry = function (ordfgId, checked, processStep, providerId) {
+                    console.log('Retry button clicked.  ORDataFileGroupId: ' + ordfgId + '  Current value = ' + checked + '  Step: ' + processStep + '  ProviderId: ' + providerId);
+                    this.retry = { "orDataFileGroupId": ordfgId, "providerId": providerId, "step": processStep };
                     if (checked == true) {
-                        this.retryList.push(ordfgId, processStep);
-                        console.log('retryList: ' + this.retryList);
+                        this.retryObjects.push(this.retry);
+                        console.log('retryObj: ' + this.retryObjects);
+                        console.log('stringify retryObj: ' + JSON.stringify(this.retryObjects));
                     }
                     else {
-                        var removeIndex = this.retryList.indexOf(ordfgId);
-                        this.retryList.splice(removeIndex, 2);
-                        console.log('retryList: ' + this.retryList);
+                        for (var i = 0; i < this.retryObjects.length; i++) {
+                            if (this.retryObjects[i].orDataFileGroupId == ordfgId) {
+                                this.retryObjects.splice(i, 1);
+                                break;
+                            }
+                        }
+                        /*
+                       var removeIndex = this.retryObjects.indexOf(ordfgId);
+                       this.retryList.splice(removeIndex,2)
+                       console.log('retryList: ' + this.retryObjects);
+                       */
+                        console.log('stringify retryObj: ' + JSON.stringify(this.retryObjects));
                     }
                 };
+                /*  ORIGINAL
+                
+                    onToggleRetry(ordfgId, checked, processStep, providerId): void{
+                        console.log('Retry button clicked.  ORDataFileGroupId: ' + ordfgId + '  Current value = ' + checked + '  Step: ' + processStep);
+                        
+                        if(checked == true){
+                        this.retryList.push(ordfgId,processStep);
+                        console.log('retryList: ' + this.retryList);
+                        }
+                        else{
+                           var removeIndex = this.retryList.indexOf(ordfgId);
+                           this.retryList.splice(removeIndex,2)
+                           console.log('retryList: ' + this.retryList);
+                        }
+                    }*/
                 ORFileListComponent.prototype.onClickReleaseRetry = function () {
                     console.log('Release Retry Items');
                 };
                 ORFileListComponent.prototype.onClickRunDataUtilities = function () {
+                    var _this = this;
                     console.log('IN onClickRunDataUtilties  ');
+                    console.log('utilityList: ' + this.utilityList);
+                    //build json object
+                    this._orfileService.postRunUtility(this.utilityObjects)
+                        .subscribe(function (data) { return _this.postDataUtilities = JSON.stringify(data); }, function (error) { return _this.errorMessage = error; });
                 };
                 ORFileListComponent.prototype.onClickClose = function () {
                     console.log('Close App');
@@ -123,36 +155,72 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     //var endString: string = ((this.endDate).getFullYear()).toString() + "/" + ((this.endDate).getMonth()).toString() + "/" + ((this.endDate).getDay()).toString();        
                     console.log('End Date: ' + this.endDate);
                 };
+                /*
+                  onUtilitySelected(message:string, ordfgId, providerId): void{
+                         console.log('IN onUtilitySelected  orfile-list component ');
+                         console.log('IN onUtilitySelected  message: ' + message);
+                        console.log('IN onUtilitySelected  ORDataFileGroupId: ' + ordfgId + '  ProviderId: ' + providerId  );
+                
+                         if(message == '2' || message == '3'){
+                
+                            //var existIndex = this.utilityList.indexOf("orDataFileGroupId:"+ordfgId);
+                            
+                            console.log('IN onUtilitySelected  ORDataFileGroupId : '+ ordfgId + ' exists in arraty at position ' + existIndex);
+                            
+                            if(existIndex > -1){
+                                this.utilityList.splice(existIndex,3)
+                                console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+                                }
+                    
+                                if(message == '2'){
+                                    this.utilityList.push(ordfgId, providerId, "unconvert");
+                                    //this.utilityList.push("orDataFileGroupId:"+ordfgId, "providerId:"+providerId, "type:unconvert");
+                                }
+                                else if(message == '3'){
+                                    this.utilityList.push(ordfgId, providerId, "purgeAll");
+                                   // this.utilityList.push("orDataFileGroupId:"+ordfgId, "providerId:"+providerId, "type:purgeAll");
+                                }
+                             console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+                    
+                        }
+                        else{
+                            var existIndex = this.utilityList.indexOf("orDataFileGroupId:"+ordfgId);
+                            console.log('IN onUtilitySelected  ORDataFileGroupId : '+ ordfgId + ' exists in arraty at position ' + existIndex);
+                            if(existIndex > -1){
+                                this.utilityList.splice(existIndex,3)
+                                console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+                            }
+                            else{
+                            console.log('IN onUtilitySelected  NO UTILITY CHOSEN: ');
+                            console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+                            }
+                        }
+                    }*/
                 ORFileListComponent.prototype.onUtilitySelected = function (message, ordfgId, providerId) {
                     console.log('IN onUtilitySelected  orfile-list component ');
                     console.log('IN onUtilitySelected  message: ' + message);
                     console.log('IN onUtilitySelected  ORDataFileGroupId: ' + ordfgId + '  ProviderId: ' + providerId);
-                    if (message == '2' || message == '3') {
-                        var existIndex = this.utilityList.indexOf(ordfgId);
-                        console.log('IN onUtilitySelected  ORDataFileGroupId : ' + ordfgId + ' exists in arraty at position ' + existIndex);
-                        if (existIndex > -1) {
-                            this.utilityList.splice(existIndex, 3);
-                            console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
-                        }
-                        if (message == '2') {
-                            this.utilityList.push(ordfgId, providerId, 'unconvert');
-                        }
-                        else if (message == '3') {
-                            this.utilityList.push(ordfgId, providerId, 'purgeAll');
-                        }
-                        console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+                    var type;
+                    if (message == '2') {
+                        type = 'unconvert';
+                    }
+                    else if (message == '3') {
+                        type = 'purgeAll';
                     }
                     else {
-                        var existIndex = this.utilityList.indexOf(ordfgId);
-                        console.log('IN onUtilitySelected  ORDataFileGroupId : ' + ordfgId + ' exists in arraty at position ' + existIndex);
-                        if (existIndex > -1) {
-                            this.utilityList.splice(existIndex, 3);
-                            console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
+                        type = '';
+                    }
+                    this.utility = { "orDataFileGroupId": ordfgId, "providerId": providerId, "type": type };
+                    for (var i = 0; i < this.utilityObjects.length; i++) {
+                        if (this.utilityObjects[i].orDataFileGroupId == ordfgId) {
+                            this.utilityObjects.splice(i, 1);
+                            break;
                         }
-                        else {
-                            console.log('IN onUtilitySelected  NO UTILITY CHOSEN: ');
-                            console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
-                        }
+                    }
+                    if (message == '2' || message == '3') {
+                        this.utilityObjects.push(this.utility);
+                        console.log('retryObj: ' + this.retryObjects);
+                        console.log('stringify retryObj: ' + JSON.stringify(this.utilityObjects));
                     }
                 };
                 ORFileListComponent.prototype.formatDate = function (dateToFormat) {
@@ -182,6 +250,13 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     }
                     else
                         return true;
+                };
+                ORFileListComponent.prototype.buildRunUtility = function (utilityList) {
+                    var jsonData = {};
+                };
+                ORFileListComponent.prototype.containsObject = function (ordfgid) {
+                    if (this.utilityList.filter(function (e) { return e.orDataFileGroupId == ordfgid; }).length > 0) {
+                    }
                 };
                 ORFileListComponent = __decorate([
                     core_1.Component({

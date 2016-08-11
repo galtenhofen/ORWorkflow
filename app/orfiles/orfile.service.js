@@ -25,10 +25,10 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable'], function(
             }],
         execute: function() {
             ORFileService = (function () {
-                // private _orfileUrl = 'http://crp12vdtibapp09:10430/WebService/ORWorkflowService/ORWorkflowService.serviceagent/ORWorkflowService';
+                //http://crp12vdtib03:8080/ORWorkflow/service/utility
                 function ORFileService(_http) {
                     this._http = _http;
-                    this._orfileUrl = 'http://crp12vdtib03:8080/ORWorkflow/service/status';
+                    this._orfileUrl = 'http://crp12vdtib03:8080/ORWorkflow/service';
                 }
                 ORFileService.prototype.getORFilesToday = function () {
                     return this._http.get(this._orfileUrl)
@@ -37,15 +37,34 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable'], function(
                         .catch(this.handleError);
                 };
                 ORFileService.prototype.getORFilesByDate = function (beginDate, endDate) {
-                    console.log("URL: " + this._orfileUrl + "/" + beginDate + "/" + endDate);
-                    return this._http.get(this._orfileUrl + "/" + beginDate + "/" + endDate)
+                    console.log("URL: " + this._orfileUrl + "/status" + "/" + beginDate + "/" + endDate);
+                    return this._http.get(this._orfileUrl + "/status" + "/" + beginDate + "/" + endDate)
                         .map(function (response) { return response.json(); })
                         .do(function (data) { return console.log("By Date: " + JSON.stringify(data)); })
+                        .catch(this.handleError);
+                };
+                ORFileService.prototype.postRunUtility = function (utilities) {
+                    console.log('IN postRunUtility  utilities: ' + utilities);
+                    var body = JSON.stringify(utilities);
+                    //let body = "{" + utility + "}";
+                    var headers = new http_1.Headers({ 'Content-Type': 'application/json' });
+                    var options = new http_1.RequestOptions({ headers: headers });
+                    return this._http.post(this._orfileUrl + "/utilities", body, options)
+                        .do(function (data) { return console.log("POST Response: " + JSON.stringify(data)); })
+                        .map(this.extractData)
                         .catch(this.handleError);
                 };
                 ORFileService.prototype.handleError = function (error) {
                     console.error(error);
                     return Observable_1.Observable.throw(error.json().error || 'Server error');
+                };
+                ORFileService.prototype.extractData = function (res) {
+                    var body;
+                    // check if empty, before call json
+                    if (res.text()) {
+                        body = res.json();
+                    }
+                    return body || {};
                 };
                 ORFileService = __decorate([
                     core_1.Injectable(), 

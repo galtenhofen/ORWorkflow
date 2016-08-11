@@ -1,4 +1,6 @@
 import {IORFile} from './orfile';
+import {IUtility} from './utility';
+import {IRetry} from './retry';
 import {Component, OnInit} from 'angular2/core';
 import {ProviderIdFilterPipe} from './orfile-providerIdfilter.pipe';
 import {FileTypeFilterPipe} from './orfile-fileTypefilter.pipe';
@@ -37,7 +39,11 @@ export class ORFileListComponent
     orfiles: IORFile[];
     retryList: any[] = [];
     utilityList: any[] = [];
-   // resizeMode: string = "BasicResizer";
+    postDataUtilities: string;
+    utilityObjects: IUtility[] = [];
+    retryObjects: IRetry[] = [];
+    retry: IRetry;
+    utility: IUtility;
 
 constructor(private _orfileService: ORFileService){
 
@@ -93,7 +99,37 @@ constructor(private _orfileService: ORFileService){
         }
     }
 
-    onToggleRetry(ordfgId, checked, processStep): void{
+     onToggleRetry(ordfgId, checked, processStep, providerId): void{
+        console.log('Retry button clicked.  ORDataFileGroupId: ' + ordfgId + '  Current value = ' + checked + '  Step: ' + processStep + '  ProviderId: ' + providerId);
+        
+       this.retry = {"orDataFileGroupId": ordfgId, "providerId": providerId, "step": processStep  };
+
+        if(checked == true){
+        this.retryObjects.push(this.retry);
+        console.log('retryObj: ' + this.retryObjects);
+        console.log('stringify retryObj: ' + JSON.stringify(this.retryObjects));
+        }
+        else{
+
+            for(var i = 0; i <  this.retryObjects.length; i++) {
+                if( this.retryObjects[i].orDataFileGroupId == ordfgId) {
+                     this.retryObjects.splice(i, 1);
+                    break;
+                    }
+        }
+            /*
+           var removeIndex = this.retryObjects.indexOf(ordfgId);
+           this.retryList.splice(removeIndex,2)
+           console.log('retryList: ' + this.retryObjects);
+           */
+          console.log('stringify retryObj: ' + JSON.stringify(this.retryObjects));
+        }
+    }
+
+
+/*  ORIGINAL
+
+    onToggleRetry(ordfgId, checked, processStep, providerId): void{
         console.log('Retry button clicked.  ORDataFileGroupId: ' + ordfgId + '  Current value = ' + checked + '  Step: ' + processStep);
         
         if(checked == true){
@@ -105,7 +141,7 @@ constructor(private _orfileService: ORFileService){
            this.retryList.splice(removeIndex,2)
            console.log('retryList: ' + this.retryList);
         }
-    }
+    }*/
 
     onClickReleaseRetry(): void{
         console.log('Release Retry Items');
@@ -113,6 +149,15 @@ constructor(private _orfileService: ORFileService){
 
     onClickRunDataUtilities(): void{
         console.log('IN onClickRunDataUtilties  ');
+        console.log('utilityList: ' + this.utilityList);
+
+        //build json object
+
+
+        this._orfileService.postRunUtility(this.utilityObjects)
+                .subscribe(
+                    data => this.postDataUtilities = JSON.stringify(data), 
+                    error => this.errorMessage = <any>error);
     }
 
     onClickClose(): void{
@@ -135,31 +180,36 @@ constructor(private _orfileService: ORFileService){
         //var endString: string = ((this.endDate).getFullYear()).toString() + "/" + ((this.endDate).getMonth()).toString() + "/" + ((this.endDate).getDay()).toString();        
         console.log('End Date: ' + this.endDate);
     }
-
-    onUtilitySelected(message:string, ordfgId, providerId): void{
+/*
+  onUtilitySelected(message:string, ordfgId, providerId): void{
          console.log('IN onUtilitySelected  orfile-list component ');
          console.log('IN onUtilitySelected  message: ' + message);
         console.log('IN onUtilitySelected  ORDataFileGroupId: ' + ordfgId + '  ProviderId: ' + providerId  );
 
          if(message == '2' || message == '3'){
-            var existIndex = this.utilityList.indexOf(ordfgId);
+
+            //var existIndex = this.utilityList.indexOf("orDataFileGroupId:"+ordfgId);
+            
             console.log('IN onUtilitySelected  ORDataFileGroupId : '+ ordfgId + ' exists in arraty at position ' + existIndex);
+            
             if(existIndex > -1){
                 this.utilityList.splice(existIndex,3)
                 console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
                 }
     
-                if(message == '2'){    
-                    this.utilityList.push(ordfgId,providerId, 'unconvert');
+                if(message == '2'){   
+                    this.utilityList.push(ordfgId, providerId, "unconvert"); 
+                    //this.utilityList.push("orDataFileGroupId:"+ordfgId, "providerId:"+providerId, "type:unconvert");
                 }
                 else if(message == '3'){
-                    this.utilityList.push(ordfgId,providerId, 'purgeAll');
+                    this.utilityList.push(ordfgId, providerId, "purgeAll"); 
+                   // this.utilityList.push("orDataFileGroupId:"+ordfgId, "providerId:"+providerId, "type:purgeAll");
                 }
              console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
     
         }
         else{
-            var existIndex = this.utilityList.indexOf(ordfgId);
+            var existIndex = this.utilityList.indexOf("orDataFileGroupId:"+ordfgId);
             console.log('IN onUtilitySelected  ORDataFileGroupId : '+ ordfgId + ' exists in arraty at position ' + existIndex);
             if(existIndex > -1){
                 this.utilityList.splice(existIndex,3)
@@ -170,6 +220,34 @@ constructor(private _orfileService: ORFileService){
             console.log('IN onUtilitySelected utilityList: ' + this.utilityList);
        	    }
         }
+    }*/
+
+
+    onUtilitySelected(message:string, ordfgId, providerId): void{
+         console.log('IN onUtilitySelected  orfile-list component ');
+         console.log('IN onUtilitySelected  message: ' + message);
+         console.log('IN onUtilitySelected  ORDataFileGroupId: ' + ordfgId + '  ProviderId: ' + providerId  );
+        var type: string;
+
+        if(message == '2'){type = 'unconvert'}
+        else if(message == '3'){type = 'purgeAll'}
+        else{type = ''}
+
+        this.utility = {"orDataFileGroupId": ordfgId, "providerId": providerId, "type": type  };
+
+             for(var i = 0; i <  this.utilityObjects.length; i++) {
+                if( this.utilityObjects[i].orDataFileGroupId == ordfgId) {
+                     this.utilityObjects.splice(i, 1);
+                    break;
+                    }
+                }
+
+        if(message == '2' || message == '3'){
+            this.utilityObjects.push(this.utility);
+            console.log('retryObj: ' + this.retryObjects);
+            console.log('stringify retryObj: ' + JSON.stringify(this.utilityObjects)); 
+        }
+  
     }
 
     formatDate(dateToFormat:Date): string{
@@ -200,4 +278,15 @@ constructor(private _orfileService: ORFileService){
         }
         else return true;
     }
+
+    buildRunUtility(utilityList:any[]){
+        var jsonData = {};
+
+    }
+
+    containsObject(ordfgid){
+        if (this.utilityList.filter(function(e){return e.orDataFileGroupId == ordfgid}).length>0) {
+        }
+    }
+
 }
