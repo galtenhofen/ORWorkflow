@@ -32,9 +32,14 @@ export class ORFileFilterPipe implements PipeTransform{
                        
             }
              if(statfilter){
-                value = value.filter((value: IORFile) =>
-                    value.processStatus.toLocaleLowerCase().indexOf(statfilter) != -1);
-                    
+                    if (statfilter==="open cases"){
+                        value = value.filter((value: IORFile) =>
+                        (value.processStatus.toLocaleLowerCase().indexOf("failed") != -1 || value.processStatus.toLocaleLowerCase().indexOf("in progress") != -1 || value.processStatus.toLocaleLowerCase().indexOf("pending") != -1 || value.processStatus.toLocaleLowerCase().indexOf("waiting for match") != -1 || value.processStatus.toLocaleLowerCase().indexOf("matched") != -1 || value.processStatus.toLocaleLowerCase().indexOf("not matched") != -1);
+                    }
+                    else {
+                        value = value.filter((value: IORFile) =>
+                        value.processStatus.toLocaleLowerCase().indexOf(statfilter) != -1);
+                    }
             }
            return value;
                 

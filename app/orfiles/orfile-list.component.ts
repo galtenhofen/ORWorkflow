@@ -40,6 +40,7 @@ export class ORFileListComponent
     retryList: any[] = [];
     utilityList: any[] = [];
     postDataUtilities: string;
+    postRetries: string;
     utilityObjects: IUtility[] = [];
     retryObjects: IRetry[] = [];
     retry: IRetry;
@@ -74,6 +75,7 @@ constructor(private _orfileService: ORFileService){
                 .subscribe(
                     orfiles => this.orfiles = orfiles,
                     error => this.errorMessage = <any>error);
+
     }
 /*
  showConfirmDialog() {
@@ -102,7 +104,7 @@ constructor(private _orfileService: ORFileService){
      onToggleRetry(ordfgId, checked, processStep, providerId): void{
         console.log('Retry button clicked.  ORDataFileGroupId: ' + ordfgId + '  Current value = ' + checked + '  Step: ' + processStep + '  ProviderId: ' + providerId);
         
-       this.retry = {"orDataFileGroupId": ordfgId, "providerId": providerId, "step": processStep  };
+       this.retry = {"orDataFileGroupId": ordfgId, "providerId": providerId, "step": processStep, "userName" : "galtenhofen"   };
 
         if(checked == true){
         this.retryObjects.push(this.retry);
@@ -117,11 +119,7 @@ constructor(private _orfileService: ORFileService){
                     break;
                     }
         }
-            /*
-           var removeIndex = this.retryObjects.indexOf(ordfgId);
-           this.retryList.splice(removeIndex,2)
-           console.log('retryList: ' + this.retryObjects);
-           */
+
           console.log('stringify retryObj: ' + JSON.stringify(this.retryObjects));
         }
     }
@@ -145,6 +143,12 @@ constructor(private _orfileService: ORFileService){
 
     onClickReleaseRetry(): void{
         console.log('Release Retry Items');
+        console.log('utilityList: ' + this.utilityList);
+
+        this._orfileService.postReleaseRetry(this.retryObjects)
+                .subscribe(
+                    data => this.postRetries = JSON.stringify(data), 
+                    error => this.errorMessage = <any>error);
     }
 
     onClickRunDataUtilities(): void{
@@ -154,7 +158,7 @@ constructor(private _orfileService: ORFileService){
         //build json object
 
 
-        this._orfileService.postRunUtility(this.utilityObjects)
+        this._orfileService.postRunUtilities(this.utilityObjects)
                 .subscribe(
                     data => this.postDataUtilities = JSON.stringify(data), 
                     error => this.errorMessage = <any>error);
@@ -233,7 +237,7 @@ constructor(private _orfileService: ORFileService){
         else if(message == '3'){type = 'purgeAll'}
         else{type = ''}
 
-        this.utility = {"orDataFileGroupId": ordfgId, "providerId": providerId, "type": type  };
+        this.utility = {"orDataFileGroupId": ordfgId, "providerId": providerId, "step": type, "userName" : "galtenhofen"  };
 
              for(var i = 0; i <  this.utilityObjects.length; i++) {
                 if( this.utilityObjects[i].orDataFileGroupId == ordfgId) {
@@ -288,5 +292,21 @@ constructor(private _orfileService: ORFileService){
         if (this.utilityList.filter(function(e){return e.orDataFileGroupId == ordfgid}).length>0) {
         }
     }
+
+       makeTableScroll() {
+            var maxRows = 10;
+
+            var table: any = (<HTMLInputElement>document.getElementById('orFilesTable')).value;
+            var wrapper: any = (<HTMLInputElement>document.getElementById('orFilesTable')).parentNode;
+            //var wrapper = table.parentNode;
+            var rowsInTable = table.rows.length;
+            var height = 0;
+            if (rowsInTable > maxRows) {
+                for (var i = 0; i < maxRows; i++) {
+                    height += table.rows[i].clientHeight;
+                }
+                wrapper.style.height = height + "px";
+            }
+        }
 
 }

@@ -91,7 +91,7 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                 };
                 ORFileListComponent.prototype.onToggleRetry = function (ordfgId, checked, processStep, providerId) {
                     console.log('Retry button clicked.  ORDataFileGroupId: ' + ordfgId + '  Current value = ' + checked + '  Step: ' + processStep + '  ProviderId: ' + providerId);
-                    this.retry = { "orDataFileGroupId": ordfgId, "providerId": providerId, "step": processStep };
+                    this.retry = { "orDataFileGroupId": ordfgId, "providerId": providerId, "step": processStep, "userName": "galtenhofen" };
                     if (checked == true) {
                         this.retryObjects.push(this.retry);
                         console.log('retryObj: ' + this.retryObjects);
@@ -104,11 +104,6 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                                 break;
                             }
                         }
-                        /*
-                       var removeIndex = this.retryObjects.indexOf(ordfgId);
-                       this.retryList.splice(removeIndex,2)
-                       console.log('retryList: ' + this.retryObjects);
-                       */
                         console.log('stringify retryObj: ' + JSON.stringify(this.retryObjects));
                     }
                 };
@@ -128,14 +123,18 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                         }
                     }*/
                 ORFileListComponent.prototype.onClickReleaseRetry = function () {
+                    var _this = this;
                     console.log('Release Retry Items');
+                    console.log('utilityList: ' + this.utilityList);
+                    this._orfileService.postReleaseRetry(this.retryObjects)
+                        .subscribe(function (data) { return _this.postRetries = JSON.stringify(data); }, function (error) { return _this.errorMessage = error; });
                 };
                 ORFileListComponent.prototype.onClickRunDataUtilities = function () {
                     var _this = this;
                     console.log('IN onClickRunDataUtilties  ');
                     console.log('utilityList: ' + this.utilityList);
                     //build json object
-                    this._orfileService.postRunUtility(this.utilityObjects)
+                    this._orfileService.postRunUtilities(this.utilityObjects)
                         .subscribe(function (data) { return _this.postDataUtilities = JSON.stringify(data); }, function (error) { return _this.errorMessage = error; });
                 };
                 ORFileListComponent.prototype.onClickClose = function () {
@@ -210,7 +209,7 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     else {
                         type = '';
                     }
-                    this.utility = { "orDataFileGroupId": ordfgId, "providerId": providerId, "type": type };
+                    this.utility = { "orDataFileGroupId": ordfgId, "providerId": providerId, "step": type, "userName": "galtenhofen" };
                     for (var i = 0; i < this.utilityObjects.length; i++) {
                         if (this.utilityObjects[i].orDataFileGroupId == ordfgId) {
                             this.utilityObjects.splice(i, 1);
@@ -256,6 +255,20 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                 };
                 ORFileListComponent.prototype.containsObject = function (ordfgid) {
                     if (this.utilityList.filter(function (e) { return e.orDataFileGroupId == ordfgid; }).length > 0) {
+                    }
+                };
+                ORFileListComponent.prototype.makeTableScroll = function () {
+                    var maxRows = 10;
+                    var table = document.getElementById('orFilesTable').value;
+                    var wrapper = document.getElementById('orFilesTable').parentNode;
+                    //var wrapper = table.parentNode;
+                    var rowsInTable = table.rows.length;
+                    var height = 0;
+                    if (rowsInTable > maxRows) {
+                        for (var i = 0; i < maxRows; i++) {
+                            height += table.rows[i].clientHeight;
+                        }
+                        wrapper.style.height = height + "px";
                     }
                 };
                 ORFileListComponent = __decorate([

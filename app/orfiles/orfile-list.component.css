@@ -4,18 +4,23 @@ thead{
 }
 
 table{
-    table-layout:auto;
+    table-layout: fixed;
+    width:  100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+th{
+    text-align: center;
+    vertical-align: center;
 }
 
-table tr{
-height:20px;   
-overflow-x: hidden;         
+td{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
-table td{
-height:20px;
-max-width: 100px;
-overflow-x: hidden;  
-overflow-y: hidden; 
-white-space: nowrap;       
-}
+
+.scrollingTable {
+            overflow-y: auto;
+        }

@@ -44,9 +44,16 @@ System.register(['angular2/core'], function(exports_1, context_1) {
                         });
                     }
                     if (statfilter) {
-                        value = value.filter(function (value) {
-                            return value.processStatus.toLocaleLowerCase().indexOf(statfilter) != -1;
-                        });
+                        if (statfilter === "open cases") {
+                            value = value.filter(function (value) {
+                                return (value.processStatus.toLocaleLowerCase().indexOf("failed") != -1 || value.processStatus.toLocaleLowerCase().indexOf("in progress") != -1 || value.processStatus.toLocaleLowerCase().indexOf("pending") != -1 || value.processStatus.toLocaleLowerCase().indexOf("waiting for match") != -1 || value.processStatus.toLocaleLowerCase().indexOf("matched") != -1 || value.processStatus.toLocaleLowerCase().indexOf("not matched") != -1);
+                            });
+                        }
+                        else {
+                            value = value.filter(function (value) {
+                                return value.processStatus.toLocaleLowerCase().indexOf(statfilter) != -1;
+                            });
+                        }
                     }
                     return value;
                 };

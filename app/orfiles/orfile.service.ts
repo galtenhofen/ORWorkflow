@@ -26,33 +26,55 @@ export class ORFileService{
                     .catch(this.handleError);
                     }
 
-        postRunUtility(utilities) {
+        postRunUtilities(utilities) {
                 console.log('IN postRunUtility  utilities: ' + utilities);
                 let body = JSON.stringify(utilities);
                 //let body = "{" + utility + "}";
                 let headers = new Headers({ 'Content-Type': 'application/json' });
                 let options = new RequestOptions({ headers: headers });
 
-                return this._http.post(this._orfileUrl + "/utilities", body, options)
+                return this._http.post(this._orfileUrl + "/ordatalist", body, options)
                     .do(data => console.log("POST Response: " + JSON.stringify(data)))
-                    .map(this.extractData)
+                    .map(this.extractData2)
                     .catch(this.handleError);
                     }
+        
+        postReleaseRetry(retries) {
+                console.log('IN postReleaseRetry  retries: ' + retries);
+                let body = JSON.stringify(retries);
+                let headers = new Headers({ 'Content-Type': 'application/json' });
+                let options = new RequestOptions({ headers: headers });
 
+                return this._http.post(this._orfileUrl + "/ordatalist", body, options)
+                    .do(data => console.log("POST Response: " + JSON.stringify(data)))
+                    .map(this.extractData2)
+                    .catch(this.handleError);
+                    }
 
         private handleError(error: Response){
             console.error(error);
             return Observable.throw(error.json().error || 'Server error');
         }
-
+/*
         private extractData(res: Response) {
             let body;
 
             // check if empty, before call json
              if (res.text()) {
-            body = res.json();
+                body = res.json();
                 }
 
             return body || {};
+        }*/
+
+        private extractData2(res: Response) {
+            let status;
+
+            // check if empty, before call json
+             if (res.status) {
+                status = res.status;
+                }
+console.log('IN  extractData2  STATUS:' + status);
+            return status || {};
         }
 }

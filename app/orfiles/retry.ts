@@ -2,6 +2,7 @@ export interface IRetry {
 
         orDataFileGroupId: number,
         providerId: string,
-        step: string
+        step: string,
+        userName: string
      
 }

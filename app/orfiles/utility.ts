@@ -2,6 +2,7 @@ export interface IUtility {
 
         orDataFileGroupId: number,
         providerId: string,
-        type: string
+        step: string,
+        userName: string
      
 }
