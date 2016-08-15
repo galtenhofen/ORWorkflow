@@ -31,6 +31,9 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx', 'angular2/platform
                 orfile_service_1 = orfile_service_1_1;
             }],
         execute: function() {
+            //import {ConfirmService} from "./shared/confirm/confirm.service";
+            //import {ConfirmComponent} from "./shared/confirm/confirm.component";
+            //declare var componentHandler:any;
             AppComponent = (function () {
                 function AppComponent() {
                     this.pageTitle = 'OR Workflow Status';

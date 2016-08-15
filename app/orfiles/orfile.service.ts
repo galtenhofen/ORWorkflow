@@ -35,7 +35,7 @@ export class ORFileService{
 
                 return this._http.post(this._orfileUrl + "/ordatalist", body, options)
                     .do(data => console.log("POST Response: " + JSON.stringify(data)))
-                    .map(this.extractData2)
+                    .map(this.checkResponseStatus)
                     .catch(this.handleError);
                     }
         
@@ -47,7 +47,7 @@ export class ORFileService{
 
                 return this._http.post(this._orfileUrl + "/ordatalist", body, options)
                     .do(data => console.log("POST Response: " + JSON.stringify(data)))
-                    .map(this.extractData2)
+                    .map(this.checkResponseStatus)
                     .catch(this.handleError);
                     }
 
@@ -55,26 +55,15 @@ export class ORFileService{
             console.error(error);
             return Observable.throw(error.json().error || 'Server error');
         }
-/*
-        private extractData(res: Response) {
-            let body;
 
-            // check if empty, before call json
-             if (res.text()) {
-                body = res.json();
-                }
-
-            return body || {};
-        }*/
-
-        private extractData2(res: Response) {
+        private checkResponseStatus(res: Response) {
             let status;
 
             // check if empty, before call json
              if (res.status) {
                 status = res.status;
                 }
-console.log('IN  extractData2  STATUS:' + status);
+console.log('IN  checkResponseStatus STATUS:' + status);
             return status || {};
         }
 }

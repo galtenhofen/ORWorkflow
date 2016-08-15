@@ -5,6 +5,9 @@ import 'rxjs/Rx';  //Load all features
 import {bootstrap} from 'angular2/platform/browser';
 import {ORFileListComponent} from './orfiles/orfile-list.component';
 import {ORFileService} from './orfiles/orfile.service';
+//import {ConfirmService} from "./shared/confirm/confirm.service";
+//import {ConfirmComponent} from "./shared/confirm/confirm.component";
+//declare var componentHandler:any;
 
 @Component({
     selector: 'orw-app',

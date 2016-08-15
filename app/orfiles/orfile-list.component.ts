@@ -9,20 +9,17 @@ import {ORFileFilterPipe} from './orfile-orfilefilter.pipe';
 import {bootstrap} from 'angular2/platform/browser';
 import {UtilityListComponent} from '../utilities/utility-list.component';
 import {ORFileService} from './orfile.service';
-import {SoapService} from 'angular2-soap-master/src/soap.service';
-//import {ngTableResize} from '../../node_modules/angular-table-resize/dist/angular-table-resize.js';
-//import {ConfirmService} from "../shared/confirm/confirm.service";
-//import {ConfirmComponent} from "../shared/confirm/confirm.component";
-
-//declare var componentHandler:any;
+import {ConfirmService} from "../shared/confirm/confirm.service";
+import {ConfirmComponent} from "../shared/confirm/confirm.component";
+declare var componentHandler:any;
 
 @Component({
 selector: 'orw-orfiles',
 templateUrl: 'app/orfiles/orfile-list.component.html',
 styleUrls: ['app/orfiles/orfile-list.component.css', 'app/shared/confirm/confirm.component.css'],
 pipes:([ProviderIdFilterPipe],[FileTypeFilterPipe],[SubsystemFilterPipe],[ORFileFilterPipe]),
-directives: [UtilityListComponent]
-
+directives: [UtilityListComponent, ConfirmComponent],
+providers: [ConfirmService]
 
 })
 export class ORFileListComponent
@@ -45,15 +42,16 @@ export class ORFileListComponent
     retryObjects: IRetry[] = [];
     retry: IRetry;
     utility: IUtility;
+    confirmResponse:string = '';
 
-constructor(private _orfileService: ORFileService){
+constructor(private _orfileService: ORFileService, private _confirmService:ConfirmService){
 
 }
 
 
     ngOnInit(): any{
          console.log('IN  OnInit');
-
+     componentHandler.upgradeDom();
      console.log('Set Dates to Current');    
      //var dateBegin: Date = new Date();
      //var dateEnd: Date = new Date();
@@ -77,21 +75,52 @@ constructor(private _orfileService: ORFileService){
                     error => this.errorMessage = <any>error);
 
     }
-/*
- showConfirmDialog() {
-       this._confirmService.activate("Are you sure?")
-           .then(res => console.log(`Confirmed: ${res}`));
-   }*/
+
+
+ showConfirmDialog(stringTitle) {
+     console.log('IN showConfirmDialog  action: ' + stringTitle);
+     var stringMessage:string;
+     if(stringTitle === "DataUtilties"){
+         stringMessage = "Are you sure you want to run selected Data Utilities?"
+     }
+      if(stringTitle === "ReleaseRetry"){
+         stringMessage = "Are you sure you want to release selected Retry items?"
+
+
+     }
+        this._confirmService.activate(stringMessage, stringTitle)
+       .then(res => this.completeRequest(stringTitle, res));
+                //this.completeRequest(stringTitle, res));
+           //.then(res => console.log(`Confirmed: ${res}`));
+
+   }
+
+   completeRequest(strTitle, boolConfirm) {
+
+           if(boolConfirm){
+               if(strTitle === "DataUtilities"){
+                    this._orfileService.postRunUtilities(this.utilityObjects)
+                    .subscribe(
+                    data => this.postDataUtilities = JSON.stringify(data), 
+                    error => this.errorMessage = <any>error);
+                }
+                if(strTitle === "ReleaseRetry"){
+                    this._orfileService.postReleaseRetry(this.retryObjects)
+                    .subscribe(
+                    data => this.postRetries = JSON.stringify(data), 
+                    error => this.errorMessage = <any>error);
+                }
+            }
+            else{console.log('Requested cancelled by user');}
+   }
+
 
     onClickrefreshORList(): void{
-
         var run:boolean = this.validateReceivedDates(this.beginDate, this.endDate);
         console.log('After Validate.  run: ' + run);
         if (run == true){
         console.log('Refreshing OR Files...');
-                //var beginString: string = ((this.beginDate).getFullYear()).toString() + "/" + ((this.beginDate).getMonth()).toString() + "/" + ((this.beginDate).getDay()).toString();
-                //var endString: string = ((this.endDate).getFullYear()).toString() + "/" + ((this.endDate).getMonth()).toString() + "/" + ((this.endDate).getDay()).toString();
-                this._orfileService.getORFilesByDate(this.beginDate, this.endDate)
+          this._orfileService.getORFilesByDate(this.beginDate, this.endDate)
                 .subscribe(
                     orfiles => this.orfiles = orfiles,
                     error => this.errorMessage = <any>error);
@@ -154,8 +183,6 @@ constructor(private _orfileService: ORFileService){
     onClickRunDataUtilities(): void{
         console.log('IN onClickRunDataUtilties  ');
         console.log('utilityList: ' + this.utilityList);
-
-        //build json object
 
 
         this._orfileService.postRunUtilities(this.utilityObjects)

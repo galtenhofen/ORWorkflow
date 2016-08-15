@@ -51,7 +51,7 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable'], function(
                     var options = new http_1.RequestOptions({ headers: headers });
                     return this._http.post(this._orfileUrl + "/ordatalist", body, options)
                         .do(function (data) { return console.log("POST Response: " + JSON.stringify(data)); })
-                        .map(this.extractData2)
+                        .map(this.checkResponseStatus)
                         .catch(this.handleError);
                 };
                 ORFileService.prototype.postReleaseRetry = function (retries) {
@@ -61,31 +61,20 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable'], function(
                     var options = new http_1.RequestOptions({ headers: headers });
                     return this._http.post(this._orfileUrl + "/ordatalist", body, options)
                         .do(function (data) { return console.log("POST Response: " + JSON.stringify(data)); })
-                        .map(this.extractData2)
+                        .map(this.checkResponseStatus)
                         .catch(this.handleError);
                 };
                 ORFileService.prototype.handleError = function (error) {
                     console.error(error);
                     return Observable_1.Observable.throw(error.json().error || 'Server error');
                 };
-                /*
-                        private extractData(res: Response) {
-                            let body;
-                
-                            // check if empty, before call json
-                             if (res.text()) {
-                                body = res.json();
-                                }
-                
-                            return body || {};
-                        }*/
-                ORFileService.prototype.extractData2 = function (res) {
+                ORFileService.prototype.checkResponseStatus = function (res) {
                     var status;
                     // check if empty, before call json
                     if (res.status) {
                         status = res.status;
                     }
-                    console.log('IN  extractData2  STATUS:' + status);
+                    console.log('IN  checkResponseStatus STATUS:' + status);
                     return status || {};
                 };
                 ORFileService = __decorate([
