@@ -1,13 +1,12 @@
 
 import {Component} from 'angular2/core';
 import {HTTP_PROVIDERS} from 'angular2/http';
+import {ROUTER_PROVIDERS} from 'angular2/router';
 import 'rxjs/Rx';  //Load all features
 import {bootstrap} from 'angular2/platform/browser';
 import {ORFileListComponent} from './orfiles/orfile-list.component';
 import {ORFileService} from './orfiles/orfile.service';
-//import {ConfirmService} from "./shared/confirm/confirm.service";
-//import {ConfirmComponent} from "./shared/confirm/confirm.component";
-//declare var componentHandler:any;
+
 
 @Component({
     selector: 'orw-app',
@@ -15,7 +14,7 @@ import {ORFileService} from './orfiles/orfile.service';
    <orw-orfiles></orw-orfiles>
     </div>`,
     directives: [ORFileListComponent],
-    providers:  [ORFileService, HTTP_PROVIDERS]
+    providers:  [ORFileService, HTTP_PROVIDERS, ROUTER_PROVIDERS]
 })
 
 export class AppComponent{

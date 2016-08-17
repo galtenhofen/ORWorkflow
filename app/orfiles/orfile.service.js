@@ -25,23 +25,26 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable'], function(
             }],
         execute: function() {
             ORFileService = (function () {
-                //http://crp12vdtib03:8080/ORWorkflow/service/utility
                 function ORFileService(_http) {
                     this._http = _http;
                     this._orfileUrl = 'http://crp12vdtib03:8080/ORWorkflow/service';
+                    //http://crp12vdtib03:8080/ORWorkflow/service/utility
+                    this.info = { loading: 'no' };
                 }
                 ORFileService.prototype.getORFilesToday = function () {
                     return this._http.get(this._orfileUrl)
                         .map(function (response) { return response.json(); })
                         .do(function (data) { return console.log("All: " + JSON.stringify(data)); })
-                        .catch(this.handleError);
+                        .catch(this.throwStatus);
                 };
                 ORFileService.prototype.getORFilesByDate = function (beginDate, endDate) {
-                    console.log("URL: " + this._orfileUrl + "/status" + "/" + beginDate + "/" + endDate);
+                    var _this = this;
+                    console.log("URL: " + this._orfileUrl + "/statuss" + "/" + beginDate + "/" + endDate);
                     return this._http.get(this._orfileUrl + "/status" + "/" + beginDate + "/" + endDate)
+                        .finally(function () { return _this.info.loading = 'no'; })
                         .map(function (response) { return response.json(); })
                         .do(function (data) { return console.log("By Date: " + JSON.stringify(data)); })
-                        .catch(this.handleError);
+                        .catch(this.throwStatus);
                 };
                 ORFileService.prototype.postRunUtilities = function (utilities) {
                     console.log('IN postRunUtility  utilities: ' + utilities);
@@ -52,7 +55,7 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable'], function(
                     return this._http.post(this._orfileUrl + "/ordatalist", body, options)
                         .do(function (data) { return console.log("POST Response: " + JSON.stringify(data)); })
                         .map(this.checkResponseStatus)
-                        .catch(this.handleError);
+                        .catch(this.throwStatus);
                 };
                 ORFileService.prototype.postReleaseRetry = function (retries) {
                     console.log('IN postReleaseRetry  retries: ' + retries);
@@ -62,11 +65,12 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable'], function(
                     return this._http.post(this._orfileUrl + "/ordatalist", body, options)
                         .do(function (data) { return console.log("POST Response: " + JSON.stringify(data)); })
                         .map(this.checkResponseStatus)
-                        .catch(this.handleError);
+                        .catch(this.throwStatus);
                 };
-                ORFileService.prototype.handleError = function (error) {
-                    console.error(error);
-                    return Observable_1.Observable.throw(error.json().error || 'Server error');
+                ORFileService.prototype.throwStatus = function (error) {
+                    console.log('IN throwStatus  error.status = ' + error.status);
+                    console.error(error.status);
+                    return Observable_1.Observable.throw(error.status || 'Server error');
                 };
                 ORFileService.prototype.checkResponseStatus = function (res) {
                     var status;

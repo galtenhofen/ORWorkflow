@@ -1,7 +1,8 @@
 import {IORFile} from './orfile';
 import {IUtility} from './utility';
 import {IRetry} from './retry';
-import {Component, OnInit} from 'angular2/core';
+import {ILoadInfo} from './loadInfo';
+import {Component, OnInit, bind} from 'angular2/core';
 import {ProviderIdFilterPipe} from './orfile-providerIdfilter.pipe';
 import {FileTypeFilterPipe} from './orfile-fileTypefilter.pipe';
 import {SubsystemFilterPipe} from './orfile-subsystemfilter.pipe';
@@ -30,6 +31,7 @@ export class ORFileListComponent
     subsystemFilter: string = '';
     statusFilter: string = '';
     errorMessage: string;
+    httpStatus: string;
     beginDate: string;
     endDate: string;
     currentORFileGroupId: string;
@@ -43,37 +45,32 @@ export class ORFileListComponent
     retry: IRetry;
     utility: IUtility;
     confirmResponse:string = '';
+    loading: any;
+    info: ILoadInfo;
 
 constructor(private _orfileService: ORFileService, private _confirmService:ConfirmService){
-
+    this.info = this._orfileService.info;
 }
 
 
     ngOnInit(): any{
-         console.log('IN  OnInit');
+    console.log('IN  OnInit');
+     
      componentHandler.upgradeDom();
      console.log('Set Dates to Current');    
-     //var dateBegin: Date = new Date();
-     //var dateEnd: Date = new Date();
 
      this.beginDate = this.formatDate(new Date());
      this.endDate = this.formatDate(new Date());
-
-     //this.beginDate = ((dateBegin).getFullYear()).toString() + "-" + ((dateBegin).getMonth()).toString() + "-" + ((dateBegin).getDate()).toString();
-     //this.endDate = ((dateEnd).getFullYear()).toString() + "-" + ((dateEnd).getMonth()).toString() + "-" + ((dateEnd).getDate()).toString();
-
-
     console.log('BeginDate: ' + this.beginDate + "   EndDate:  " + this.endDate );
 
 
     console.log('Retrieving OR Files...');
 
-      // this._orfileService.getORFilesToday()
       this._orfileService.getORFilesByDate(this.beginDate, this.endDate)
                 .subscribe(
                     orfiles => this.orfiles = orfiles,
+                    //status => this.httpStatus = <any>status);
                     error => this.errorMessage = <any>error);
-
     }
 
 
@@ -119,15 +116,21 @@ constructor(private _orfileService: ORFileService, private _confirmService:Confi
         var run:boolean = this.validateReceivedDates(this.beginDate, this.endDate);
         console.log('After Validate.  run: ' + run);
         if (run == true){
+            this.orfiles = [];
+            this.loading = 'yes';
         console.log('Refreshing OR Files...');
           this._orfileService.getORFilesByDate(this.beginDate, this.endDate)
                 .subscribe(
                     orfiles => this.orfiles = orfiles,
                     error => this.errorMessage = <any>error);
+                  
         }
         else{
+            alert('You entered a begin date ('+this.beginDate+') that is after the end date ('+this.endDate+ ') and that makes no sense.');
             console.log('You fucked up the dates');
         }
+
+    
     }
 
      onToggleRetry(ordfgId, checked, processStep, providerId): void{
@@ -193,6 +196,10 @@ constructor(private _orfileService: ORFileService, private _confirmService:Confi
 
     onClickClose(): void{
         console.log('Close App');
+        if(confirm('You wanna close the app?')){
+            alert('The app would have closed')
+        }
+        
     }
 
     onChangeDateReceivedFrom(selectedDate): void{

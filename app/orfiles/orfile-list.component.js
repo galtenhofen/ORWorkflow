@@ -56,23 +56,21 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     this.utilityObjects = [];
                     this.retryObjects = [];
                     this.confirmResponse = '';
+                    this.info = this._orfileService.info;
                 }
                 ORFileListComponent.prototype.ngOnInit = function () {
                     var _this = this;
                     console.log('IN  OnInit');
                     componentHandler.upgradeDom();
                     console.log('Set Dates to Current');
-                    //var dateBegin: Date = new Date();
-                    //var dateEnd: Date = new Date();
                     this.beginDate = this.formatDate(new Date());
                     this.endDate = this.formatDate(new Date());
-                    //this.beginDate = ((dateBegin).getFullYear()).toString() + "-" + ((dateBegin).getMonth()).toString() + "-" + ((dateBegin).getDate()).toString();
-                    //this.endDate = ((dateEnd).getFullYear()).toString() + "-" + ((dateEnd).getMonth()).toString() + "-" + ((dateEnd).getDate()).toString();
                     console.log('BeginDate: ' + this.beginDate + "   EndDate:  " + this.endDate);
                     console.log('Retrieving OR Files...');
-                    // this._orfileService.getORFilesToday()
                     this._orfileService.getORFilesByDate(this.beginDate, this.endDate)
-                        .subscribe(function (orfiles) { return _this.orfiles = orfiles; }, function (error) { return _this.errorMessage = error; });
+                        .subscribe(function (orfiles) { return _this.orfiles = orfiles; }, 
+                    //status => this.httpStatus = <any>status);
+                    function (error) { return _this.errorMessage = error; });
                 };
                 ORFileListComponent.prototype.showConfirmDialog = function (stringTitle) {
                     var _this = this;
@@ -110,11 +108,14 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     var run = this.validateReceivedDates(this.beginDate, this.endDate);
                     console.log('After Validate.  run: ' + run);
                     if (run == true) {
+                        this.orfiles = [];
+                        this.loading = 'yes';
                         console.log('Refreshing OR Files...');
                         this._orfileService.getORFilesByDate(this.beginDate, this.endDate)
                             .subscribe(function (orfiles) { return _this.orfiles = orfiles; }, function (error) { return _this.errorMessage = error; });
                     }
                     else {
+                        alert('You entered a begin date (' + this.beginDate + ') that is after the end date (' + this.endDate + ') and that makes no sense.');
                         console.log('You fucked up the dates');
                     }
                 };
@@ -167,6 +168,9 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                 };
                 ORFileListComponent.prototype.onClickClose = function () {
                     console.log('Close App');
+                    if (confirm('You wanna close the app?')) {
+                        alert('The app would have closed');
+                    }
                 };
                 ORFileListComponent.prototype.onChangeDateReceivedFrom = function (selectedDate) {
                     console.log('Changed Date Received From.  Setting this.beginDate');

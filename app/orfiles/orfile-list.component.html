@@ -89,8 +89,7 @@
                         <th>Retry<br>Count</th>
                         <th>Data<br>Utility</th>
                     </tr>
-                </thead>
-               
+                </thead>           
                 <tbody >
                 <tr *ngFor='let orfile of orfiles | orfileFilter:providerFilter:fileTypeFilter:subsystemFilter:statusFilter'>
                     <td style="text-align:center">{{orfile.pduJobNumber}}</td>
@@ -112,15 +111,24 @@
                     <td *ngIf="orfile.processStatus!='Failed'"><div></div></td>   
                     <td style="text-align:center">{{orfile.retryCount}}</td>
                     <td *ngIf="!orfile.publishCompleteDate"><orw-utility-list (utilitySelected)='onUtilitySelected($event, orfile.orDataFileGroupID, orfile.providerID)'></orw-utility-list></td>
-                 </tr>   
+                 </tr> 
+                
                 </tbody>
                </table>
-                <div class= 'panel-heading' *ngIf='!orfiles || orfiles.length < 1'>
+
+               <div class= 'panel-heading' *ngIf='loading=="yes" && (!orfiles || orfiles.length < 1)'>
+                      Retrieving ORFiles...
+                   </div>   
+               <div class= 'panel-heading' *ngIf='errorMessage'>
+                      There was a problem retrieving ORFiles.  Error Code: {{errorMessage}}
+                   </div>  
+                <div class= 'panel-heading' *ngIf='(!orfiles || orfiles.length < 1) && !errorMessage && loading!="yes"'>
                       There is no data for the chosen dates
                    </div>  
            </div> <!-- this is the table-responsive wrapper-->  
         </body>
 </div> 
+
      
                 <div align="right">
                     
