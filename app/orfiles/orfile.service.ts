@@ -3,13 +3,15 @@ import {IORFile} from './orfile';
 import {ILoadInfo} from './loadInfo';
 import {Http, Request, Response, Headers, RequestOptions, URLSearchParams} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
+import {Subject} from 'rxjs/Subject';
 
 @Injectable()
 export class ORFileService{
         private _orfileUrl = 'http://crp12vdtib03:8080/ORWorkflow/service';
-                            //http://crp12vdtib03:8080/ORWorkflow/service/utility
-        info: ILoadInfo = { loading : 'no' }; 
-        constructor(private _http: Http){ }
+
+        loading:boolean; 
+
+        constructor(private _http: Http){ this.loading=false; }
     
         getORFilesToday(): Observable<IORFile[]>{
                      return this._http.get(this._orfileUrl)
@@ -18,20 +20,20 @@ export class ORFileService{
                     .catch(this.throwStatus);
                     }
 
-        getORFilesByDate(beginDate:string, endDate:string): Observable<IORFile[]>{
-                        
-                     console.log("URL: " +this._orfileUrl + "/statuss" + "/" + beginDate + "/" + endDate);
-                     return this._http.get(this._orfileUrl + "/status" + "/" + beginDate + "/" + endDate)
-                    .finally( ()=> this.info.loading = 'no')
+        getORFilesByDate(beginDate:string, endDate:string): Observable<IORFile[]>{ 
+                     console.log("IN getORFilesByDate -   URL: " +this._orfileUrl + "/status" + "/" + beginDate + "/" + endDate);
+                     return this._http.get(this._orfileUrl + "/status" + "/" + beginDate + "/" + endDate) 
+                    .finally( () => this.loading = false)
                     .map((response: Response) => <IORFile[]>response.json())
-                    .do(data => console.log("By Date: " + JSON.stringify(data)))
-                    .catch(this.throwStatus);
+                    .do(data => console.log("IN getORFilesByDate -   By Date: " + JSON.stringify(data)))
+                    .catch(this.throwStatus)
+                    
+
                    }
 
         postRunUtilities(utilities) {
                 console.log('IN postRunUtility  utilities: ' + utilities);
                 let body = JSON.stringify(utilities);
-                //let body = "{" + utility + "}";
                 let headers = new Headers({ 'Content-Type': 'application/json' });
                 let options = new RequestOptions({ headers: headers });
 

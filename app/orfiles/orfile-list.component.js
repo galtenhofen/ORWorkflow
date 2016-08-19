@@ -1,4 +1,4 @@
-System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fileTypefilter.pipe', './orfile-subsystemfilter.pipe', './orfile-orfilefilter.pipe', '../utilities/utility-list.component', './orfile.service', "../shared/confirm/confirm.service", "../shared/confirm/confirm.component"], function(exports_1, context_1) {
+System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fileTypefilter.pipe', './orfile-subsystemfilter.pipe', './orfile-orfilefilter.pipe', '../utilities/utility-list.component', './orfile.service', '../shared/confirm/confirm.service', '../shared/confirm/confirm.component', 'angular2/router'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,7 +10,7 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, orfile_providerIdfilter_pipe_1, orfile_fileTypefilter_pipe_1, orfile_subsystemfilter_pipe_1, orfile_orfilefilter_pipe_1, utility_list_component_1, orfile_service_1, confirm_service_1, confirm_component_1;
+    var core_1, orfile_providerIdfilter_pipe_1, orfile_fileTypefilter_pipe_1, orfile_subsystemfilter_pipe_1, orfile_orfilefilter_pipe_1, utility_list_component_1, orfile_service_1, confirm_service_1, confirm_component_1, router_1;
     var ORFileListComponent;
     return {
         setters:[
@@ -40,6 +40,9 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
             },
             function (confirm_component_1_1) {
                 confirm_component_1 = confirm_component_1_1;
+            },
+            function (router_1_1) {
+                router_1 = router_1_1;
             }],
         execute: function() {
             ORFileListComponent = (function () {
@@ -56,21 +59,19 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     this.utilityObjects = [];
                     this.retryObjects = [];
                     this.confirmResponse = '';
-                    this.info = this._orfileService.info;
+                    this.loading = false;
+                    this.loading = this._orfileService.loading;
                 }
                 ORFileListComponent.prototype.ngOnInit = function () {
                     var _this = this;
                     console.log('IN  OnInit');
                     componentHandler.upgradeDom();
-                    console.log('Set Dates to Current');
                     this.beginDate = this.formatDate(new Date());
                     this.endDate = this.formatDate(new Date());
-                    console.log('BeginDate: ' + this.beginDate + "   EndDate:  " + this.endDate);
                     console.log('Retrieving OR Files...');
+                    this.loading = true;
                     this._orfileService.getORFilesByDate(this.beginDate, this.endDate)
-                        .subscribe(function (orfiles) { return _this.orfiles = orfiles; }, 
-                    //status => this.httpStatus = <any>status);
-                    function (error) { return _this.errorMessage = error; });
+                        .subscribe(function (orfiles) { return _this.orfiles = orfiles; }, function (error) { return _this.errorMessage = error; }, function () { return _this.onRequestComplete(); });
                 };
                 ORFileListComponent.prototype.showConfirmDialog = function (stringTitle) {
                     var _this = this;
@@ -84,8 +85,6 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     }
                     this._confirmService.activate(stringMessage, stringTitle)
                         .then(function (res) { return _this.completeRequest(stringTitle, res); });
-                    //this.completeRequest(stringTitle, res));
-                    //.then(res => console.log(`Confirmed: ${res}`));
                 };
                 ORFileListComponent.prototype.completeRequest = function (strTitle, boolConfirm) {
                     var _this = this;
@@ -105,19 +104,21 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                 };
                 ORFileListComponent.prototype.onClickrefreshORList = function () {
                     var _this = this;
+                    this.disableButtons();
                     var run = this.validateReceivedDates(this.beginDate, this.endDate);
-                    console.log('After Validate.  run: ' + run);
                     if (run == true) {
                         this.orfiles = [];
-                        this.loading = 'yes';
-                        console.log('Refreshing OR Files...');
+                        this.loading = true;
                         this._orfileService.getORFilesByDate(this.beginDate, this.endDate)
-                            .subscribe(function (orfiles) { return _this.orfiles = orfiles; }, function (error) { return _this.errorMessage = error; });
+                            .subscribe(function (orfiles) { return _this.orfiles = orfiles; }, function (error) { return _this.errorMessage = error; }, 
+                        //() => (this.loading = this._orfileService.loading));
+                        function () { return (_this.onRequestComplete()); });
                     }
                     else {
                         alert('You entered a begin date (' + this.beginDate + ') that is after the end date (' + this.endDate + ') and that makes no sense.');
                         console.log('You fucked up the dates');
                     }
+                    console.log('Leaving onClickrefreshORList  this.loading: ' + this.loading);
                 };
                 ORFileListComponent.prototype.onToggleRetry = function (ordfgId, checked, processStep, providerId) {
                     console.log('Retry button clicked.  ORDataFileGroupId: ' + ordfgId + '  Current value = ' + checked + '  Step: ' + processStep + '  ProviderId: ' + providerId);
@@ -289,6 +290,23 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     if (this.utilityList.filter(function (e) { return e.orDataFileGroupId == ordfgid; }).length > 0) {
                     }
                 };
+                ORFileListComponent.prototype.showOrFileDetail = function () {
+                    console.log('IN  showOrFileDetail');
+                };
+                ORFileListComponent.prototype.onRequestComplete = function () {
+                    this.loading = this._orfileService.loading;
+                    this.enableButtons();
+                };
+                ORFileListComponent.prototype.disableButtons = function () {
+                    document.getElementById('retryBtn').disabled = true;
+                    document.getElementById('utilityBtn').disabled = true;
+                    document.getElementById('closeBtn').disabled = true;
+                };
+                ORFileListComponent.prototype.enableButtons = function () {
+                    document.getElementById('retryBtn').disabled = false;
+                    document.getElementById('utilityBtn').disabled = false;
+                    document.getElementById('closeBtn').disabled = false;
+                };
                 ORFileListComponent.prototype.makeTableScroll = function () {
                     var maxRows = 10;
                     var table = document.getElementById('orFilesTable').value;
@@ -305,11 +323,10 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                 };
                 ORFileListComponent = __decorate([
                     core_1.Component({
-                        selector: 'orw-orfiles',
                         templateUrl: 'app/orfiles/orfile-list.component.html',
                         styleUrls: ['app/orfiles/orfile-list.component.css', 'app/shared/confirm/confirm.component.css'],
                         pipes: ([orfile_providerIdfilter_pipe_1.ProviderIdFilterPipe], [orfile_fileTypefilter_pipe_1.FileTypeFilterPipe], [orfile_subsystemfilter_pipe_1.SubsystemFilterPipe], [orfile_orfilefilter_pipe_1.ORFileFilterPipe]),
-                        directives: [utility_list_component_1.UtilityListComponent, confirm_component_1.ConfirmComponent],
+                        directives: [utility_list_component_1.UtilityListComponent, confirm_component_1.ConfirmComponent, router_1.ROUTER_DIRECTIVES],
                         providers: [confirm_service_1.ConfirmService]
                     }), 
                     __metadata('design:paramtypes', [orfile_service_1.ORFileService, confirm_service_1.ConfirmService])

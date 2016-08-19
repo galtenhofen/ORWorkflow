@@ -28,8 +28,7 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable'], function(
                 function ORFileService(_http) {
                     this._http = _http;
                     this._orfileUrl = 'http://crp12vdtib03:8080/ORWorkflow/service';
-                    //http://crp12vdtib03:8080/ORWorkflow/service/utility
-                    this.info = { loading: 'no' };
+                    this.loading = false;
                 }
                 ORFileService.prototype.getORFilesToday = function () {
                     return this._http.get(this._orfileUrl)
@@ -39,17 +38,16 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable'], function(
                 };
                 ORFileService.prototype.getORFilesByDate = function (beginDate, endDate) {
                     var _this = this;
-                    console.log("URL: " + this._orfileUrl + "/statuss" + "/" + beginDate + "/" + endDate);
+                    console.log("IN getORFilesByDate -   URL: " + this._orfileUrl + "/status" + "/" + beginDate + "/" + endDate);
                     return this._http.get(this._orfileUrl + "/status" + "/" + beginDate + "/" + endDate)
-                        .finally(function () { return _this.info.loading = 'no'; })
+                        .finally(function () { return _this.loading = false; })
                         .map(function (response) { return response.json(); })
-                        .do(function (data) { return console.log("By Date: " + JSON.stringify(data)); })
+                        .do(function (data) { return console.log("IN getORFilesByDate -   By Date: " + JSON.stringify(data)); })
                         .catch(this.throwStatus);
                 };
                 ORFileService.prototype.postRunUtilities = function (utilities) {
                     console.log('IN postRunUtility  utilities: ' + utilities);
                     var body = JSON.stringify(utilities);
-                    //let body = "{" + utility + "}";
                     var headers = new http_1.Headers({ 'Content-Type': 'application/json' });
                     var options = new http_1.RequestOptions({ headers: headers });
                     return this._http.post(this._orfileUrl + "/ordatalist", body, options)

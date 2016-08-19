@@ -1,3 +1,3 @@
 export interface ILoadInfo{
-   loading:string;
+   loading:boolean;
 }

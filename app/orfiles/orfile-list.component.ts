@@ -10,19 +10,23 @@ import {ORFileFilterPipe} from './orfile-orfilefilter.pipe';
 import {bootstrap} from 'angular2/platform/browser';
 import {UtilityListComponent} from '../utilities/utility-list.component';
 import {ORFileService} from './orfile.service';
-import {ConfirmService} from "../shared/confirm/confirm.service";
-import {ConfirmComponent} from "../shared/confirm/confirm.component";
+import {ConfirmService} from '../shared/confirm/confirm.service';
+import {ConfirmComponent} from '../shared/confirm/confirm.component';
+import {ROUTER_DIRECTIVES} from 'angular2/router';
+
 declare var componentHandler:any;
 
 @Component({
-selector: 'orw-orfiles',
 templateUrl: 'app/orfiles/orfile-list.component.html',
 styleUrls: ['app/orfiles/orfile-list.component.css', 'app/shared/confirm/confirm.component.css'],
 pipes:([ProviderIdFilterPipe],[FileTypeFilterPipe],[SubsystemFilterPipe],[ORFileFilterPipe]),
-directives: [UtilityListComponent, ConfirmComponent],
+directives: [UtilityListComponent, ConfirmComponent, ROUTER_DIRECTIVES],
 providers: [ConfirmService]
 
 })
+
+
+
 export class ORFileListComponent
                 implements OnInit{
     pageTitle: string = 'OR Status';
@@ -45,11 +49,10 @@ export class ORFileListComponent
     retry: IRetry;
     utility: IUtility;
     confirmResponse:string = '';
-    loading: any;
-    info: ILoadInfo;
+    loading: boolean = false;
 
 constructor(private _orfileService: ORFileService, private _confirmService:ConfirmService){
-    this.info = this._orfileService.info;
+    this.loading = this._orfileService.loading;
 }
 
 
@@ -57,22 +60,18 @@ constructor(private _orfileService: ORFileService, private _confirmService:Confi
     console.log('IN  OnInit');
      
      componentHandler.upgradeDom();
-     console.log('Set Dates to Current');    
-
      this.beginDate = this.formatDate(new Date());
      this.endDate = this.formatDate(new Date());
-    console.log('BeginDate: ' + this.beginDate + "   EndDate:  " + this.endDate );
-
 
     console.log('Retrieving OR Files...');
-
+    this.loading=true;
       this._orfileService.getORFilesByDate(this.beginDate, this.endDate)
                 .subscribe(
                     orfiles => this.orfiles = orfiles,
-                    //status => this.httpStatus = <any>status);
-                    error => this.errorMessage = <any>error);
-    }
+                    error => this.errorMessage = <any>error,
+                    () => this.onRequestComplete());
 
+    }
 
  showConfirmDialog(stringTitle) {
      console.log('IN showConfirmDialog  action: ' + stringTitle);
@@ -87,8 +86,6 @@ constructor(private _orfileService: ORFileService, private _confirmService:Confi
      }
         this._confirmService.activate(stringMessage, stringTitle)
        .then(res => this.completeRequest(stringTitle, res));
-                //this.completeRequest(stringTitle, res));
-           //.then(res => console.log(`Confirmed: ${res}`));
 
    }
 
@@ -113,24 +110,24 @@ constructor(private _orfileService: ORFileService, private _confirmService:Confi
 
 
     onClickrefreshORList(): void{
+        this.disableButtons();
         var run:boolean = this.validateReceivedDates(this.beginDate, this.endDate);
-        console.log('After Validate.  run: ' + run);
         if (run == true){
             this.orfiles = [];
-            this.loading = 'yes';
-        console.log('Refreshing OR Files...');
+            this.loading = true;
           this._orfileService.getORFilesByDate(this.beginDate, this.endDate)
                 .subscribe(
                     orfiles => this.orfiles = orfiles,
-                    error => this.errorMessage = <any>error);
-                  
+                    error => this.errorMessage = <any>error,
+                    //() => (this.loading = this._orfileService.loading));
+                    () => (this.onRequestComplete()));
         }
         else{
             alert('You entered a begin date ('+this.beginDate+') that is after the end date ('+this.endDate+ ') and that makes no sense.');
             console.log('You fucked up the dates');
         }
 
-    
+    console.log('Leaving onClickrefreshORList  this.loading: ' + this.loading);
     }
 
      onToggleRetry(ordfgId, checked, processStep, providerId): void{
@@ -326,6 +323,29 @@ constructor(private _orfileService: ORFileService, private _confirmService:Confi
         if (this.utilityList.filter(function(e){return e.orDataFileGroupId == ordfgid}).length>0) {
         }
     }
+
+    showOrFileDetail(){
+        console.log('IN  showOrFileDetail');
+    }
+
+    onRequestComplete(){
+    this.loading = this._orfileService.loading;
+    this.enableButtons();
+    }
+
+    disableButtons(){
+        (<HTMLInputElement> document.getElementById('retryBtn')).disabled = true;
+        (<HTMLInputElement> document.getElementById('utilityBtn')).disabled = true;
+        (<HTMLInputElement> document.getElementById('closeBtn')).disabled = true;
+    }
+
+    enableButtons(){
+        
+        (<HTMLInputElement> document.getElementById('retryBtn')).disabled = false;
+        (<HTMLInputElement> document.getElementById('utilityBtn')).disabled = false;
+        (<HTMLInputElement> document.getElementById('closeBtn')).disabled = false;
+    }
+
 
        makeTableScroll() {
             var maxRows = 10;

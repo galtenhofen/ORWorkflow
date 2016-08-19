@@ -19,7 +19,7 @@ export class ORFileFilterPipe implements PipeTransform{
                     let filefilter: string = argFile ? argFile.toLocaleLowerCase(): null;
                     let subfilter: string = argSub ? argSub.toLocaleLowerCase(): null;
                     let statfilter: string = argStat ? argStat.toLocaleLowerCase(): null;
-                    console.log("prov: " + provfilter + " - file: " + filefilter + " - sub: " + subfilter + " - stat: " + statfilter)
+                    console.log("prov: " + provfilter + " - file: " + filefilter + " - sub: " + subfilter + " - stat: " + statfilter);
 
             if(provfilter){
                 value = value.filter((orfile: IORFile) =>
@@ -39,7 +39,7 @@ export class ORFileFilterPipe implements PipeTransform{
              if(statfilter){
                     if (statfilter==="open cases"){
                         value = value.filter((value: IORFile) =>
-                        (value.processStatus.toLocaleLowerCase().indexOf("failed") != -1 || value.processStatus.toLocaleLowerCase().indexOf("in progress") != -1 || value.processStatus.toLocaleLowerCase().indexOf("pending") != -1 || value.processStatus.toLocaleLowerCase().indexOf("waiting for match") != -1 || value.processStatus.toLocaleLowerCase().indexOf("matched") != -1 || value.processStatus.toLocaleLowerCase().indexOf("not matched") != -1);
+                        (value.processStatus.toLocaleLowerCase().indexOf("failed") != -1 || value.processStatus.toLocaleLowerCase().indexOf("in progress") != -1 || value.processStatus.toLocaleLowerCase().indexOf("pending") != -1 || value.processStatus.toLocaleLowerCase().indexOf("waiting for match") != -1 || value.processStatus.toLocaleLowerCase().indexOf("matched") != -1 || value.processStatus.toLocaleLowerCase().indexOf("not matched") != -1));
                     }
                     else {
                         value = value.filter((value: IORFile) =>

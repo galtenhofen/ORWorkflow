@@ -1,13 +1,14 @@
 <div class='panel panel-primary'>
     <div class='panel-heading'>
         <div class='row'>
-            <div class='col-xs-3'>Date File Received From:</div>
+            <div class='col-xs-1'></div>
+            <div class='col-xs-2' align='right'>Date File Received From:</div>
             <div class='col-xs-2'>
-                <input type="date" [(ngModel)]="beginDate" class="form-control" (change)="onChangeDateReceivedFrom($event.target.value)">
+                <input style='width:70%' type="date" [(ngModel)]="beginDate" class="form-control" (change)="onChangeDateReceivedFrom($event.target.value)">
             </div>
-            <div class='col-xs-3'>Date File Received To:</div>
+            <div class='col-xs-2' align='right'>Date File Received To:</div>
             <div class='col-xs-2'>
-                 <input type="date" [(ngModel)]="endDate" class="form-control" (change)="onChangeDateReceivedTo($event.target.value)">
+                 <input  style='width:70%' type="date" [(ngModel)]="endDate" class="form-control" (change)="onChangeDateReceivedTo($event.target.value)">
             </div>
             <div class='col-xs-2'>
                 <button class='btn btn-success' (click)='onClickrefreshORList()'>
@@ -19,9 +20,9 @@
    <!-- Filter the Products   -->
     <div class='panel-body'>
         <div class='row'>
-            <div class='col-xs-3'>Filter by:</div>
+            <div class='col-xs-2 panel-heading'>Filter by:</div>
          </div>   
-         <div class='row'>
+         <div class = 'row'>
             <div class='col-xs-3'>
                 <input type='text' [(ngModel)]='providerFilter' placeholder="ProviderID"/>
             </div>
@@ -61,6 +62,7 @@
 </div>
 
 <div>
+
 <modal-confirm></modal-confirm>
 <body onload='makeTableScroll();'>
 <div class='scrollingTable' > 
@@ -74,18 +76,18 @@
                         <th>Date File<br>Received</th>
                         <th>Data File<br> Name</th>
                         <th>ORDataFile<br>GroupId</th>
-                        <th>ProviderID<br></th>
+                        <th style='vertical-align: middle'>ProviderID</th>
                         <th>Client<br>Name</th>
                         <th>Begin Date<br>Range</th>
                         <th>End Date<br>Range</th>
                         <th>Publish<br>Date</th>
-                        <th>Concatenated<br>File Type</th>
+                        <th style='vertical-align: middle'>File Type</th>
                         <th>Row Count<br>Expected</th>
                         <th>Row Count<br>Converted</th>
-                        <th>Step<br></th>
-                        <th>Status<br></th>
+                        <th style='vertical-align: middle'>Step</th>
+                        <th style='vertical-align: middle'>Status</th>
                         <th>Error<br>Message</th>
-                        <th>Retry<br></th>
+                        <th style='vertical-align: middle'>Retry</th>
                         <th>Retry<br>Count</th>
                         <th>Data<br>Utility</th>
                     </tr>
@@ -95,7 +97,7 @@
                     <td style="text-align:center">{{orfile.pduJobNumber}}</td>
                     <td style="text-align:center">{{orfile.dateFileReceived}}</td>
                     <td title={{orfile.rawFilename}}>{{orfile.rawFilename}}</td>
-                    <td style="text-align:center">{{orfile.orDataFileGroupID}}</td>
+                    <td style="text-align:center"> <a [routerLink]="['FileDetail', {id: orfile.orDataFileGroupID}]" >{{orfile.orDataFileGroupID}} </a></td>
                     <td style="text-align:center">{{orfile.providerID}}</td>
                     <td title={{orfile.clientName}}>{{orfile.clientName}}</td>
                     <td style="text-align:center">{{orfile.beginDateRange}}</td>
@@ -116,13 +118,13 @@
                 </tbody>
                </table>
 
-               <div class= 'panel-heading' *ngIf='loading=="yes" && (!orfiles || orfiles.length < 1)'>
+               <div class= 'panel-heading' *ngIf= 'loading && (!orfiles || orfiles.length < 1)'>
                       Retrieving ORFiles...
                    </div>   
                <div class= 'panel-heading' *ngIf='errorMessage'>
                       There was a problem retrieving ORFiles.  Error Code: {{errorMessage}}
                    </div>  
-                <div class= 'panel-heading' *ngIf='(!orfiles || orfiles.length < 1) && !errorMessage && loading!="yes"'>
+                <div class= 'panel-heading' *ngIf='(!orfiles || orfiles.length < 1) && !errorMessage && !loading'>
                       There is no data for the chosen dates
                    </div>  
            </div> <!-- this is the table-responsive wrapper-->  
@@ -131,10 +133,9 @@
 
      
                 <div align="right">
-                    
-                <button class='btn btn-primary' (click)='showConfirmDialog("ReleaseRetry")'> Release Checked Retry Items</button>
-                <button class='btn btn-primary' (click)='showConfirmDialog("DataUtilities")' > Run Selected Data Utilities </button>
-                <button class='btn btn-danger' (click)='onClickClose()' > Close </button>   
+                <button id='retryBtn' class='btn btn-primary' (click)='showConfirmDialog("ReleaseRetry")'> Release Checked Retry Items</button>
+                <button id='utilityBtn' class='btn btn-primary' (click)='showConfirmDialog("DataUtilities")' > Run Selected Data Utilities </button>
+                <button id='closeBtn' class='btn btn-danger' (click)='onClickClose()' > Close </button>   
                 </div>
                 
         </div>

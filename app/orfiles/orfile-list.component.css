@@ -1,6 +1,7 @@
 thead{
     color: #337AB7;
       width: 100%;
+      vertical-align: middle;
 }
 
 table{
@@ -12,6 +13,9 @@ table{
 th{
     text-align: center;
     vertical-align: center;
+    vertical-align: middle;
+    height: 40px;
+    line-height: 40px;
 }
 
 td{
@@ -22,6 +26,7 @@ td{
 
 
 .scrollingTable {
-            overflow-y: auto;
+            display: inline-block;
+            overflow-y: scroll;
+            max-height:600px;
         }
-
