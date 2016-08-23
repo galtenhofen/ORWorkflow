@@ -1,4 +1,4 @@
-System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fileTypefilter.pipe', './orfile-subsystemfilter.pipe', './orfile-orfilefilter.pipe', '../utilities/utility-list.component', './orfile.service', '../shared/confirm/confirm.service', '../shared/confirm/confirm.component', 'angular2/router'], function(exports_1, context_1) {
+System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fileTypefilter.pipe', './orfile-subsystemfilter.pipe', './orfile-orfilefilter.pipe', '../utilities/utility-list.component', './orfile.service', '../shared/confirm/confirm.service', '../shared/confirm/confirm.component', 'angular2/router', "../windowservice/window.service"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,7 +10,7 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, orfile_providerIdfilter_pipe_1, orfile_fileTypefilter_pipe_1, orfile_subsystemfilter_pipe_1, orfile_orfilefilter_pipe_1, utility_list_component_1, orfile_service_1, confirm_service_1, confirm_component_1, router_1;
+    var core_1, orfile_providerIdfilter_pipe_1, orfile_fileTypefilter_pipe_1, orfile_subsystemfilter_pipe_1, orfile_orfilefilter_pipe_1, utility_list_component_1, orfile_service_1, confirm_service_1, confirm_component_1, router_1, window_service_1;
     var ORFileListComponent;
     return {
         setters:[
@@ -43,12 +43,16 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
             },
             function (router_1_1) {
                 router_1 = router_1_1;
+            },
+            function (window_service_1_1) {
+                window_service_1 = window_service_1_1;
             }],
         execute: function() {
             ORFileListComponent = (function () {
-                function ORFileListComponent(_orfileService, _confirmService) {
+                function ORFileListComponent(_orfileService, _confirmService, windowService) {
                     this._orfileService = _orfileService;
                     this._confirmService = _confirmService;
+                    this.windowService = windowService;
                     this.pageTitle = 'OR Status';
                     this.providerFilter = '';
                     this.fileTypeFilter = '';
@@ -137,6 +141,7 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                         }
                         console.log('stringify retryObj: ' + JSON.stringify(this.retryObjects));
                     }
+                    this.canEnableButtons();
                 };
                 /*  ORIGINAL
                 
@@ -157,8 +162,12 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                     var _this = this;
                     console.log('Release Retry Items');
                     console.log('utilityList: ' + this.utilityList);
-                    this._orfileService.postReleaseRetry(this.retryObjects)
-                        .subscribe(function (data) { return _this.postRetries = JSON.stringify(data); }, function (error) { return _this.errorMessage = error; });
+                    if (this.utilityList.length < 0) {
+                    }
+                    else {
+                        this._orfileService.postReleaseRetry(this.retryObjects)
+                            .subscribe(function (data) { return _this.postRetries = JSON.stringify(data); }, function (error) { return _this.errorMessage = error; });
+                    }
                 };
                 ORFileListComponent.prototype.onClickRunDataUtilities = function () {
                     var _this = this;
@@ -170,7 +179,7 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                 ORFileListComponent.prototype.onClickClose = function () {
                     console.log('Close App');
                     if (confirm('You wanna close the app?')) {
-                        alert('The app would have closed');
+                        alert("This app took me a long time to develop, so you're gonna sit there and use it some more.");
                     }
                 };
                 ORFileListComponent.prototype.onChangeDateReceivedFrom = function (selectedDate) {
@@ -254,6 +263,7 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                         console.log('retryObj: ' + this.retryObjects);
                         console.log('stringify retryObj: ' + JSON.stringify(this.utilityObjects));
                     }
+                    this.canEnableButtons();
                 };
                 ORFileListComponent.prototype.formatDate = function (dateToFormat) {
                     var dayNum = dateToFormat.getDate();
@@ -295,17 +305,30 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                 };
                 ORFileListComponent.prototype.onRequestComplete = function () {
                     this.loading = this._orfileService.loading;
-                    this.enableButtons();
+                    this.canEnableButtons();
+                    //this.enableButtons();
+                };
+                ORFileListComponent.prototype.canEnableButtons = function () {
+                    if (!this.retryObjects || this.retryObjects.length < 1) {
+                        document.getElementById('retryBtn').disabled = true;
+                    }
+                    else {
+                        document.getElementById('retryBtn').disabled = false;
+                    }
+                    if (!this.utilityObjects || this.utilityObjects.length < 1) {
+                        document.getElementById('utilityBtn').disabled = true;
+                    }
+                    else {
+                        document.getElementById('utilityBtn').disabled = false;
+                    }
                 };
                 ORFileListComponent.prototype.disableButtons = function () {
                     document.getElementById('retryBtn').disabled = true;
                     document.getElementById('utilityBtn').disabled = true;
-                    document.getElementById('closeBtn').disabled = true;
                 };
                 ORFileListComponent.prototype.enableButtons = function () {
                     document.getElementById('retryBtn').disabled = false;
                     document.getElementById('utilityBtn').disabled = false;
-                    document.getElementById('closeBtn').disabled = false;
                 };
                 ORFileListComponent.prototype.makeTableScroll = function () {
                     var maxRows = 10;
@@ -327,9 +350,9 @@ System.register(['angular2/core', './orfile-providerIdfilter.pipe', './orfile-fi
                         styleUrls: ['app/orfiles/orfile-list.component.css', 'app/shared/confirm/confirm.component.css'],
                         pipes: ([orfile_providerIdfilter_pipe_1.ProviderIdFilterPipe], [orfile_fileTypefilter_pipe_1.FileTypeFilterPipe], [orfile_subsystemfilter_pipe_1.SubsystemFilterPipe], [orfile_orfilefilter_pipe_1.ORFileFilterPipe]),
                         directives: [utility_list_component_1.UtilityListComponent, confirm_component_1.ConfirmComponent, router_1.ROUTER_DIRECTIVES],
-                        providers: [confirm_service_1.ConfirmService]
+                        providers: [confirm_service_1.ConfirmService, window_service_1.WindowService]
                     }), 
-                    __metadata('design:paramtypes', [orfile_service_1.ORFileService, confirm_service_1.ConfirmService])
+                    __metadata('design:paramtypes', [orfile_service_1.ORFileService, confirm_service_1.ConfirmService, window_service_1.WindowService])
                 ], ORFileListComponent);
                 return ORFileListComponent;
             }());

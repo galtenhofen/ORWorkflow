@@ -1,4 +1,4 @@
-System.register(['angular2/core', 'angular2/http', 'rxjs/Rx', 'angular2/platform/browser', './orfiles/orfile-list.component', './orfiles/orfile.service', 'angular2/router', './orfiledetail/orfile-detail.component'], function(exports_1, context_1) {
+System.register(['angular2/core', 'angular2/http', 'rxjs/Rx', 'angular2/platform/browser', './orfiles/orfile-list.component', './orfiles/orfile.service', 'angular2/router', './orfiledetail/orfile-detail.component', './windowservice/window.service'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,7 +10,7 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx', 'angular2/platform
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, http_1, browser_1, orfile_list_component_1, orfile_service_1, router_1, orfile_detail_component_1;
+    var core_1, http_1, browser_1, orfile_list_component_1, orfile_service_1, router_1, orfile_detail_component_1, window_service_1;
     var AppComponent;
     return {
         setters:[
@@ -35,6 +35,9 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx', 'angular2/platform
             },
             function (orfile_detail_component_1_1) {
                 orfile_detail_component_1 = orfile_detail_component_1_1;
+            },
+            function (window_service_1_1) {
+                window_service_1 = window_service_1_1;
             }],
         execute: function() {
             AppComponent = (function () {
@@ -57,7 +60,7 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx', 'angular2/platform
                 return AppComponent;
             }());
             exports_1("AppComponent", AppComponent);
-            browser_1.bootstrap(AppComponent);
+            browser_1.bootstrap(AppComponent, [window_service_1.WindowService]);
         }
     }
 });

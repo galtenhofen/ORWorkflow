@@ -13,6 +13,8 @@ import {ORFileService} from './orfile.service';
 import {ConfirmService} from '../shared/confirm/confirm.service';
 import {ConfirmComponent} from '../shared/confirm/confirm.component';
 import {ROUTER_DIRECTIVES} from 'angular2/router';
+import { WindowService } from "../windowservice/window.service";
+
 
 declare var componentHandler:any;
 
@@ -21,7 +23,7 @@ templateUrl: 'app/orfiles/orfile-list.component.html',
 styleUrls: ['app/orfiles/orfile-list.component.css', 'app/shared/confirm/confirm.component.css'],
 pipes:([ProviderIdFilterPipe],[FileTypeFilterPipe],[SubsystemFilterPipe],[ORFileFilterPipe]),
 directives: [UtilityListComponent, ConfirmComponent, ROUTER_DIRECTIVES],
-providers: [ConfirmService]
+providers: [ConfirmService,  WindowService]
 
 })
 
@@ -50,9 +52,11 @@ export class ORFileListComponent
     utility: IUtility;
     confirmResponse:string = '';
     loading: boolean = false;
+   
 
-constructor(private _orfileService: ORFileService, private _confirmService:ConfirmService){
+constructor(private _orfileService: ORFileService, private _confirmService:ConfirmService, private windowService: WindowService){
     this.loading = this._orfileService.loading;
+
 }
 
 
@@ -60,6 +64,7 @@ constructor(private _orfileService: ORFileService, private _confirmService:Confi
     console.log('IN  OnInit');
      
      componentHandler.upgradeDom();
+  
      this.beginDate = this.formatDate(new Date());
      this.endDate = this.formatDate(new Date());
 
@@ -148,9 +153,11 @@ constructor(private _orfileService: ORFileService, private _confirmService:Confi
                     break;
                     }
         }
-
+          
           console.log('stringify retryObj: ' + JSON.stringify(this.retryObjects));
         }
+
+        this.canEnableButtons();    
     }
 
 
@@ -174,10 +181,15 @@ constructor(private _orfileService: ORFileService, private _confirmService:Confi
         console.log('Release Retry Items');
         console.log('utilityList: ' + this.utilityList);
 
+        if(this.utilityList.length < 0){
+
+        }
+        else{
         this._orfileService.postReleaseRetry(this.retryObjects)
                 .subscribe(
                     data => this.postRetries = JSON.stringify(data), 
                     error => this.errorMessage = <any>error);
+        }
     }
 
     onClickRunDataUtilities(): void{
@@ -194,10 +206,12 @@ constructor(private _orfileService: ORFileService, private _confirmService:Confi
     onClickClose(): void{
         console.log('Close App');
         if(confirm('You wanna close the app?')){
-            alert('The app would have closed')
+            alert("This app took me a long time to develop, so you're gonna sit there and use it some more.");
         }
         
     }
+
+    
 
     onChangeDateReceivedFrom(selectedDate): void{
         console.log('Changed Date Received From.  Setting this.beginDate');
@@ -282,27 +296,27 @@ constructor(private _orfileService: ORFileService, private _confirmService:Confi
             console.log('retryObj: ' + this.retryObjects);
             console.log('stringify retryObj: ' + JSON.stringify(this.utilityObjects)); 
         }
-  
+    this.canEnableButtons();   
     }
 
     formatDate(dateToFormat:Date): string{
-    var dayNum:number = dateToFormat.getDate();
-    var monthNum:number = dateToFormat.getMonth();
-    var dayString:string;
-    var monthString:string;
+        var dayNum:number = dateToFormat.getDate();
+        var monthNum:number = dateToFormat.getMonth();
+        var dayString:string;
+        var monthString:string;
 
-    if(dayNum < 10)
-    {dayString = '0'+ dayNum.toString()}
-    else 
-    {dayString = dayNum.toString()}
-    if(monthNum < 10)
-    {monthString = '0' + (monthNum + 1).toString()}
-    else
-    {monthString = monthNum.toString()}
+        if(dayNum < 10)
+            {dayString = '0'+ dayNum.toString()}
+        else 
+            {dayString = dayNum.toString()}
+        if(monthNum < 10)
+            {monthString = '0' + (monthNum + 1).toString()}
+        else
+            {monthString = monthNum.toString()}
 
-    console.log('IN  formatDate : ' + dateToFormat.getFullYear().toString() +"-"+monthString+"-"+dayString);
+        console.log('IN  formatDate : ' + dateToFormat.getFullYear().toString() +"-"+monthString+"-"+dayString);
 
-    return (dateToFormat.getFullYear().toString() +"-"+monthString+"-"+dayString)
+        return (dateToFormat.getFullYear().toString() +"-"+monthString+"-"+dayString)
 
     }
 
@@ -330,20 +344,36 @@ constructor(private _orfileService: ORFileService, private _confirmService:Confi
 
     onRequestComplete(){
     this.loading = this._orfileService.loading;
-    this.enableButtons();
+    this.canEnableButtons();
+    //this.enableButtons();
+    }
+
+    canEnableButtons(){
+    if(!this.retryObjects || this.retryObjects.length < 1 ){
+            (<HTMLInputElement> document.getElementById('retryBtn')).disabled = true;
+        }
+        else{
+            (<HTMLInputElement> document.getElementById('retryBtn')).disabled = false;
+        }
+     if(!this.utilityObjects || this.utilityObjects.length < 1 ){
+            (<HTMLInputElement> document.getElementById('utilityBtn')).disabled = true;
+        }
+        else{
+            (<HTMLInputElement> document.getElementById('utilityBtn')).disabled = false;
+        }    
     }
 
     disableButtons(){
         (<HTMLInputElement> document.getElementById('retryBtn')).disabled = true;
         (<HTMLInputElement> document.getElementById('utilityBtn')).disabled = true;
-        (<HTMLInputElement> document.getElementById('closeBtn')).disabled = true;
+ 
     }
 
     enableButtons(){
         
         (<HTMLInputElement> document.getElementById('retryBtn')).disabled = false;
         (<HTMLInputElement> document.getElementById('utilityBtn')).disabled = false;
-        (<HTMLInputElement> document.getElementById('closeBtn')).disabled = false;
+
     }
 
 

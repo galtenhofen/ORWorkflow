@@ -7,7 +7,7 @@ import {ORFileListComponent} from './orfiles/orfile-list.component';
 import {ORFileService} from './orfiles/orfile.service';
 import {ROUTER_PROVIDERS, RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
 import {ORFileDetailComponent} from './orfiledetail/orfile-detail.component';
-
+import { WindowService } from './windowservice/window.service';
 
 @Component({
     selector: 'orw-app',
@@ -28,4 +28,4 @@ export class AppComponent{
     pageTitle: string = 'OR Workflow Status'
 }
 
-bootstrap(AppComponent);
+bootstrap(AppComponent, [WindowService]);
