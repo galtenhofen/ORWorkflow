@@ -26,7 +26,7 @@ System.register(['angular2/core', "./confirm.service"], function(exports_1, cont
                 function ConfirmComponent(confirmService) {
                     this._defaults = {
                         title: 'Confirmation',
-                        message: 'Do you want to cancel your changes?',
+                        message: 'Are you sure you want to release selected Data Utilities?',
                         cancelText: 'Cancel',
                         okText: 'OK'
                     };

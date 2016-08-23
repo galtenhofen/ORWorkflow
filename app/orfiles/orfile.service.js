@@ -25,27 +25,59 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable'], function(
             }],
         execute: function() {
             ORFileService = (function () {
-                // private _orfileUrl = 'http://crp12vdtibapp09:10430/WebService/ORWorkflowService/ORWorkflowService.serviceagent/ORWorkflowService';
                 function ORFileService(_http) {
                     this._http = _http;
-                    this._orfileUrl = 'http://crp12vdtib03:8080/ORWorkflow/service/status';
+                    this._orfileUrl = 'http://crp12vdtib03:8080/ORWorkflow/service';
+                    this.loading = false;
                 }
                 ORFileService.prototype.getORFilesToday = function () {
                     return this._http.get(this._orfileUrl)
                         .map(function (response) { return response.json(); })
                         .do(function (data) { return console.log("All: " + JSON.stringify(data)); })
-                        .catch(this.handleError);
+                        .catch(this.throwStatus);
                 };
                 ORFileService.prototype.getORFilesByDate = function (beginDate, endDate) {
-                    console.log("URL: " + this._orfileUrl + "/" + beginDate + "/" + endDate);
-                    return this._http.get(this._orfileUrl + "/" + beginDate + "/" + endDate)
+                    var _this = this;
+                    console.log("IN getORFilesByDate -   URL: " + this._orfileUrl + "/status" + "/" + beginDate + "/" + endDate);
+                    return this._http.get(this._orfileUrl + "/status" + "/" + beginDate + "/" + endDate)
+                        .finally(function () { return _this.loading = false; })
                         .map(function (response) { return response.json(); })
-                        .do(function (data) { return console.log("By Date: " + JSON.stringify(data)); })
-                        .catch(this.handleError);
+                        .do(function (data) { return console.log("IN getORFilesByDate -   By Date: " + JSON.stringify(data)); })
+                        .catch(this.throwStatus);
                 };
-                ORFileService.prototype.handleError = function (error) {
-                    console.error(error);
-                    return Observable_1.Observable.throw(error.json().error || 'Server error');
+                ORFileService.prototype.postRunUtilities = function (utilities) {
+                    console.log('IN postRunUtility  utilities: ' + utilities);
+                    var body = JSON.stringify(utilities);
+                    var headers = new http_1.Headers({ 'Content-Type': 'application/json' });
+                    var options = new http_1.RequestOptions({ headers: headers });
+                    return this._http.post(this._orfileUrl + "/ordatalist", body, options)
+                        .do(function (data) { return console.log("POST Response: " + JSON.stringify(data)); })
+                        .map(this.checkResponseStatus)
+                        .catch(this.throwStatus);
+                };
+                ORFileService.prototype.postReleaseRetry = function (retries) {
+                    console.log('IN postReleaseRetry  retries: ' + retries);
+                    var body = JSON.stringify(retries);
+                    var headers = new http_1.Headers({ 'Content-Type': 'application/json' });
+                    var options = new http_1.RequestOptions({ headers: headers });
+                    return this._http.post(this._orfileUrl + "/ordatalist", body, options)
+                        .do(function (data) { return console.log("POST Response: " + JSON.stringify(data)); })
+                        .map(this.checkResponseStatus)
+                        .catch(this.throwStatus);
+                };
+                ORFileService.prototype.throwStatus = function (error) {
+                    console.log('IN throwStatus  error.status = ' + error.status);
+                    console.error(error.status);
+                    return Observable_1.Observable.throw(error.status || 'Server error');
+                };
+                ORFileService.prototype.checkResponseStatus = function (res) {
+                    var status;
+                    // check if empty, before call json
+                    if (res.status) {
+                        status = res.status;
+                    }
+                    console.log('IN  checkResponseStatus STATUS:' + status);
+                    return status || {};
                 };
                 ORFileService = __decorate([
                     core_1.Injectable(), 

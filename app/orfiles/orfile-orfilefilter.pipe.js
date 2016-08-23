@@ -21,12 +21,19 @@ System.register(['angular2/core'], function(exports_1, context_1) {
             ORFileFilterPipe = (function () {
                 function ORFileFilterPipe() {
                 }
-                ORFileFilterPipe.prototype.transform = function (value, args) {
-                    console.log("args:" + args);
-                    var provfilter = args[0] ? args[0].toLocaleLowerCase() : null;
-                    var filefilter = args[1] ? args[1].toLocaleLowerCase() : null;
-                    var subfilter = args[2] ? args[2].toLocaleLowerCase() : null;
-                    var statfilter = args[3] ? args[3].toLocaleLowerCase() : null;
+                /*
+                                transform(value:IORFile[], args: string[]): IORFile[]{
+                                    console.log("args:" + args);
+                                    let provfilter: string = args[0] ? args[0].toLocaleLowerCase(): null;
+                                    let filefilter: string = args[1] ? args[1].toLocaleLowerCase(): null;
+                                    let subfilter: string = args[2] ? args[2].toLocaleLowerCase(): null;
+                                    let statfilter: string = args[3] ? args[3].toLocaleLowerCase(): null;
+                */
+                ORFileFilterPipe.prototype.transform = function (value, argProv, argFile, argSub, argStat) {
+                    var provfilter = argProv ? argProv.toLocaleLowerCase() : null;
+                    var filefilter = argFile ? argFile.toLocaleLowerCase() : null;
+                    var subfilter = argSub ? argSub.toLocaleLowerCase() : null;
+                    var statfilter = argStat ? argStat.toLocaleLowerCase() : null;
                     console.log("prov: " + provfilter + " - file: " + filefilter + " - sub: " + subfilter + " - stat: " + statfilter);
                     if (provfilter) {
                         value = value.filter(function (orfile) {
@@ -44,9 +51,16 @@ System.register(['angular2/core'], function(exports_1, context_1) {
                         });
                     }
                     if (statfilter) {
-                        value = value.filter(function (value) {
-                            return value.processStatus.toLocaleLowerCase().indexOf(statfilter) != -1;
-                        });
+                        if (statfilter === "open cases") {
+                            value = value.filter(function (value) {
+                                return (value.processStatus.toLocaleLowerCase().indexOf("failed") != -1 || value.processStatus.toLocaleLowerCase().indexOf("in progress") != -1 || value.processStatus.toLocaleLowerCase().indexOf("pending") != -1 || value.processStatus.toLocaleLowerCase().indexOf("waiting for match") != -1 || value.processStatus.toLocaleLowerCase().indexOf("matched") != -1 || value.processStatus.toLocaleLowerCase().indexOf("not matched") != -1);
+                            });
+                        }
+                        else {
+                            value = value.filter(function (value) {
+                                return value.processStatus.toLocaleLowerCase().indexOf(statfilter) != -1;
+                            });
+                        }
                     }
                     return value;
                 };
